@@ -8,6 +8,11 @@
 	let config: any = null;
 
 	onMount(async () => {
+		if (!ONLYOFFICE_JS_URL) {
+			document.getElementById('status')!.textContent = 'OnlyOffice URL is not configured.';
+			return;
+		}
+
 		// Dynamically load the OnlyOffice API script
 		const script = document.createElement('script');
 		script.src = ONLYOFFICE_JS_URL;
@@ -21,6 +26,12 @@
 					Authorization: `Bearer ${token}`
 				}
 			});
+
+			if (!res.ok) {
+				const err = await res.text();
+				document.getElementById('status')!.textContent = err;
+				return;
+			}
 
 			config = await res.json();
 			await tick();
