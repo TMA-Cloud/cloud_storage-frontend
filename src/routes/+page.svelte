@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { jwtDecode } from 'jwt-decode';
 	import ImagePreviewer from '$lib/components/ImagePreviewer.svelte';
 	import { fetchFiles } from '$lib/api/files';
 	import { getIconComponent } from '$lib/utils/fileIcons';
@@ -10,7 +9,6 @@
 
 	let token = '';
 	let files: any[] = [];
-	let username: string = '...';
 	let previewImage: string | null = null;
 	let statusMessage = '';
 
@@ -20,7 +18,6 @@
 		token = raw;
 		try {
 			files = await fetchFiles(token);
-			decodeUser();
 		} catch (err: any) {
 			if (err.message.includes('401') || err.message.includes('403')) {
 				statusMessage = 'Session expired. Redirecting to login...';
@@ -31,18 +28,6 @@
 			}
 		}
 	});
-
-	function decodeUser() {
-		try {
-			const raw = localStorage.getItem('token');
-			if (!raw) return;
-			const decoded: any = jwtDecode(raw);
-			username = decoded.name || decoded.sub || 'Anonymous';
-		} catch (err) {
-			console.error('JWT decode error:', err);
-			username = 'Unknown';
-		}
-	}
 
 	function isImage(filename: string): boolean {
 		const ext = filename.split('.').pop()?.toLowerCase() || '';
