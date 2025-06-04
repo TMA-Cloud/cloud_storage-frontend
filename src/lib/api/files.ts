@@ -17,14 +17,26 @@ export async function fetchFiles(token: string): Promise<FileMeta[]> {
 		headers: { Authorization: `Bearer ${token}` }
 	});
 
-	const data = await res.json();
-
 	if (res.status === 401 || res.status === 403) {
 		throw new Error(`HTTP ${res.status}`);
 	}
 
 	if (!res.ok) {
-		throw new Error(data.error || `HTTP ${res.status}`);
+		let msg = `HTTP ${res.status}`;
+		try {
+			const err = await res.json();
+			msg = err.error || msg;
+		} catch {
+			msg += ' (invalid JSON)';
+		}
+		throw new Error(msg);
+	}
+
+	let data: FileMeta[];
+	try {
+		data = await res.json();
+	} catch {
+		throw new Error('Failed to parse files list');
 	}
 
 	return data;
@@ -43,9 +55,22 @@ export async function uploadFile(file: File, token: string): Promise<UploadRespo
 		body: form
 	});
 
-	const data = await res.json();
 	if (!res.ok) {
-		throw new Error(data.error || `HTTP ${res.status}`);
+		let msg = `HTTP ${res.status}`;
+		try {
+			const err = await res.json();
+			msg = err.error || msg;
+		} catch {
+			msg += ' (invalid JSON)';
+		}
+		throw new Error(msg);
+	}
+
+	let data: UploadResponse;
+	try {
+		data = await res.json();
+	} catch {
+		throw new Error('Failed to parse upload response');
 	}
 	return data;
 }

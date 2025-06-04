@@ -1,5 +1,10 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
+interface LoginResponse {
+	token?: string;
+	error?: string;
+}
+
 // Login function returns a token
 export async function login(username: string, password: string): Promise<string> {
 	const res = await fetch(`${API_BASE}/api/login`, {
@@ -10,8 +15,25 @@ export async function login(username: string, password: string): Promise<string>
 		body: JSON.stringify({ username, password })
 	});
 
-	const data = await res.json();
-	if (!res.ok || !data.token) {
+	if (!res.ok) {
+		let msg = `HTTP ${res.status}`;
+		try {
+			const err = await res.json();
+			msg = err.error || msg;
+		} catch {
+			msg += ' (invalid JSON)';
+		}
+		throw new Error(msg);
+	}
+
+	let data: LoginResponse;
+	try {
+		data = (await res.json()) as LoginResponse;
+	} catch {
+		throw new Error('Failed to parse login response');
+	}
+
+	if (!data.token) {
 		throw new Error(data.error || 'Login failed');
 	}
 
