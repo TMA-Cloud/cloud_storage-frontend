@@ -7,7 +7,7 @@ import {
 	FileCode2,
 	FileImage,
 	FileJson,
-	File,
+	File
 } from 'lucide-svelte';
 
 export function getIconComponent(ext: string): typeof File {
@@ -66,7 +66,7 @@ export function getIconComponent(ext: string): typeof File {
 		png: FileImage,
 		gif: FileImage,
 		bmp: FileImage,
-		svg: FileImage,
+		svg: FileImage
 	};
 
 	return iconMap[ext] || File;

@@ -33,25 +33,25 @@
 	}
 </script>
 
-<main class="min-h-screen bg-gray-900 text-white p-6 flex flex-col items-center justify-center">
-	<h1 class="text-3xl font-bold mb-6">📤 Upload a File</h1>
+<main class="flex min-h-screen flex-col items-center justify-center bg-gray-900 p-6 text-white">
+	<h1 class="mb-6 text-3xl font-bold">📤 Upload a File</h1>
 
-	<div class="bg-gray-800 p-6 rounded-xl shadow-md w-full max-w-md space-y-4">
+	<div class="w-full max-w-md space-y-4 rounded-xl bg-gray-800 p-6 shadow-md">
 		<input
 			type="file"
-			on:change={(e) => file = (e.target as HTMLInputElement).files?.[0] || null}
-			class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600"
+			on:change={(e) => (file = (e.target as HTMLInputElement).files?.[0] || null)}
+			class="block w-full text-sm text-gray-300 file:mr-4 file:rounded file:border-0 file:bg-blue-500 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-blue-600"
 		/>
 
 		<button
 			on:click={handleUpload}
-			class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full"
+			class="w-full rounded bg-green-600 px-4 py-2 font-bold text-white hover:bg-green-700"
 		>
 			🚀 Upload File
 		</button>
 
 		{#if uploadStatus}
-			<p class="text-center text-sm text-gray-300 mt-4">{uploadStatus}</p>
+			<p class="mt-4 text-center text-sm text-gray-300">{uploadStatus}</p>
 		{/if}
 	</div>
 </main>

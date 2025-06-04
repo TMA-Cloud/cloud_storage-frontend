@@ -22,21 +22,21 @@
 	<button
 		type="button"
 		aria-label="Dismiss image preview"
-		class="absolute inset-0 bg-black/80 backdrop-blur-sm cursor-default"
+		class="absolute inset-0 cursor-default bg-black/80 backdrop-blur-sm"
 		on:click={onClose}
 	></button>
 
 	<!-- Modal content -->
 	<div
 		role="document"
-		class="relative z-10 bg-gray-900/90 p-4 rounded shadow-xl border border-gray-700"
+		class="relative z-10 rounded border border-gray-700 bg-gray-900/90 p-4 shadow-xl"
 	>
-		<img src={src} alt="Preview" class="max-w-[90vw] max-h-[80vh] rounded" />
+		<img {src} alt="Preview" class="max-h-[80vh] max-w-[90vw] rounded" />
 		<button
 			type="button"
 			aria-label="Close image preview"
 			on:click={onClose}
-			class="absolute top-2 right-2 text-white bg-red-600 hover:bg-red-700 rounded-full w-8 h-8 flex items-center justify-center shadow"
+			class="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-600 text-white shadow hover:bg-red-700"
 		>
 			&times;
 		</button>
