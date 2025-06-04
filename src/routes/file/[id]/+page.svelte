@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 	import { onMount, tick } from 'svelte';
 
 	const API_BASE = import.meta.env.VITE_API_BASE_URL;
@@ -26,6 +27,13 @@
 					Authorization: `Bearer ${token}`
 				}
 			});
+
+			if (res.status === 401 || res.status === 403) {
+				localStorage.removeItem('token');
+				document.getElementById('status')!.textContent = 'Session expired. Redirecting to login...';
+				setTimeout(() => goto('/login'), 1000);
+				return;
+			}
 
 			if (!res.ok) {
 				const err = await res.text();
