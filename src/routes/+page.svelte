@@ -88,7 +88,8 @@
 					type="button"
 					on:click={() => {
 						if (isImage(file.filename)) {
-							previewImage = `${API_BASE}/api/files/${file.id}/download`;
+							const query = token ? `?token=${encodeURIComponent(token)}` : '';
+							previewImage = `${API_BASE}/api/files/${file.id}/download${query}`;
 						} else {
 							window.open(`/file/${file.id}`, '_blank');
 						}
@@ -99,7 +100,7 @@
 					<div class="flex items-center gap-4">
 						{#if isImage(file.filename)}
 							<img
-								src={`${API_BASE}/api/files/${file.id}/download`}
+								src={`${API_BASE}/api/files/${file.id}/download${token ? `?token=${encodeURIComponent(token)}` : ''}`}
 								alt={file.filename}
 								class="h-14 w-14 rounded border object-cover shadow"
 							/>
