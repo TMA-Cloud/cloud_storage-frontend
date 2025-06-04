@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { jwtDecode } from 'jwt-decode';
 	import ImagePreviewer from '$lib/components/ImagePreviewer.svelte';
 	import { fetchFiles } from '$lib/api/files';
@@ -11,13 +12,24 @@
 	let files: any[] = [];
 	let username: string = '...';
 	let previewImage: string | null = null;
+	let statusMessage = '';
 
 	onMount(async () => {
 		const raw = localStorage.getItem('token');
 		if (!raw) return;
 		token = raw;
-		files = await fetchFiles(token);
-		decodeUser();
+		try {
+			files = await fetchFiles(token);
+			decodeUser();
+		} catch (err: any) {
+			if (err.message.includes('401') || err.message.includes('403')) {
+				statusMessage = 'Session expired. Redirecting to login...';
+				localStorage.removeItem('token');
+				setTimeout(() => goto('/login'), 1000);
+			} else {
+				console.error(err);
+			}
+		}
 	});
 
 	function decodeUser() {
@@ -43,8 +55,12 @@
 		<svg class="w-8 h-8 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
 			<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z" />
 		</svg>
-		<span>Your Cloud Files</span>
-	</h1>
+       <span>Your Cloud Files</span>
+       </h1>
+
+       {#if statusMessage}
+               <p class="text-center text-red-400 mb-4">{statusMessage}</p>
+       {/if}
 
 	<!-- Upload button -->
 	<div class="mb-6 flex justify-end">

@@ -16,7 +16,18 @@ export async function fetchFiles(token: string): Promise<FileMeta[]> {
 	const res = await fetch(`${API_BASE}/api/files`, {
 		headers: { Authorization: `Bearer ${token}` }
 	});
-	return await res.json();
+
+	const data = await res.json();
+
+	if (res.status === 401 || res.status === 403) {
+		throw new Error(`HTTP ${res.status}`);
+	}
+
+	if (!res.ok) {
+		throw new Error(data.error || `HTTP ${res.status}`);
+	}
+
+	return data;
 }
 
 // Upload a file
