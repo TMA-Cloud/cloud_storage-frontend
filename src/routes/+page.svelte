@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { jwtDecode } from 'jwt-decode';
 	import ImagePreviewer from '$lib/components/ImagePreviewer.svelte';
-	import { login, fetchFiles } from '$lib/api/files';
+	import { fetchFiles } from '$lib/api/files';
 	import { getIconComponent } from '$lib/utils/fileIcons';
 
 	const API_BASE = import.meta.env.VITE_API_BASE_URL;
@@ -12,12 +12,10 @@
 	let username: string = '...';
 	let previewImage: string | null = null;
 
-	// Replace these with a login form later
-	const userId = 'admin';
-	const fullName = 'User Admin';
-
 	onMount(async () => {
-		token = await login(userId, fullName);
+		const raw = localStorage.getItem('token');
+		if (!raw) return;
+		token = raw;
 		files = await fetchFiles(token);
 		decodeUser();
 	});
@@ -97,10 +95,10 @@
 						</div>
 					</div>
 					<div>
-						<svg class="w-5 h-5 text-blue-400 opacity-0 group-hover:opacity-100 transition" fill="currentColor" viewBox="0 0 24 24">
+					<svg class="w-5 h-5 text-blue-400 opacity-0 group-hover:opacity-100 transition" fill="currentColor" viewBox="0 0 24 24">
 							<path d="M14 3v2h3.59L8 14.59 9.41 16 19 6.41V10h2V3h-7z"/>
 							<path d="M5 5h4V3H3v6h2V5z"/>
-						</svg>
+					</svg>
 					</div>
 				</button>
 			{/each}

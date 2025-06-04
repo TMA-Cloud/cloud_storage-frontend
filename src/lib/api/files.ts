@@ -1,5 +1,4 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
-
 export interface FileMeta {
 	id: string;
 	filename: string;
@@ -10,22 +9,6 @@ export interface UploadResponse {
 	id: string;
 	filename: string;
 	uploaded_at: string;
-}
-
-// Login function returns a token
-export async function login(userId: string, fullName: string): Promise<string> {
-	const res = await fetch(`${API_BASE}/api/login`, {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({ id: userId, name: fullName })
-	});
-
-	const data = await res.json();
-	if (!data.token) throw new Error('Login failed');
-	localStorage.setItem('token', data.token);
-	return data.token;
 }
 
 // Fetch list of files with proper return type
