@@ -13,7 +13,7 @@
 	import { getIconComponent } from '$lib/utils/fileIcons';
 
 	let token = '';
-	let files: any[] = [];
+	let files: FileMeta[] = [];
 	let previewImage: string | null = null;
 	let thumbnails: Record<string, string> = {};
 	let statusMessage = '';
