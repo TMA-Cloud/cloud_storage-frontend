@@ -6,8 +6,6 @@
 	const API_BASE = import.meta.env.VITE_API_BASE_URL;
 	const ONLYOFFICE_JS_URL = import.meta.env.VITE_ONLYOFFICE_JS_URL;
 
-	let config: any = null;
-
 	onMount(async () => {
 		if (!ONLYOFFICE_JS_URL) {
 			document.getElementById('status')!.textContent = 'OnlyOffice URL is not configured.';
@@ -42,7 +40,7 @@
 				return;
 			}
 
-			config = await res.json();
+			const config = await res.json();
 			await tick();
 			startEditor(config);
 		};
