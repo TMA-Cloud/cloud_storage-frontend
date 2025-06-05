@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import ImagePreviewer from '$lib/components/ImagePreviewer.svelte';
 	import FileList from '$lib/components/FileList.svelte';
+	import UploadModal from '$lib/components/UploadModal.svelte';
 	import {
 		fetchFiles,
 		type FileMeta,
@@ -17,13 +18,16 @@
 	let previewImage: string | null = null;
 	let thumbnails: Record<string, string> = {};
 	let statusMessage = '';
+	let showUploadModal = false;
 
-	onMount(async () => {
-		const raw = localStorage.getItem('token');
-		if (!raw) return;
-		token = raw;
+	async function loadFiles() {
 		try {
-			files = await fetchFiles(token);
+			const newFiles = await fetchFiles(token);
+			for (const url of Object.values(thumbnails)) {
+				URL.revokeObjectURL(url);
+			}
+			thumbnails = {};
+			files = newFiles;
 			for (const f of files) {
 				if (isImage(f.filename)) {
 					try {
@@ -44,6 +48,13 @@
 				console.error(err);
 			}
 		}
+	}
+
+	onMount(async () => {
+		const raw = localStorage.getItem('token');
+		if (!raw) return;
+		token = raw;
+		await loadFiles();
 	});
 
 	async function handleOpen(file: FileMeta) {
@@ -97,8 +108,9 @@
 
 	<!-- Upload button -->
 	<div class="mb-6 flex justify-end">
-		<a
-			href="/upload"
+		<button
+			type="button"
+			on:click={() => (showUploadModal = true)}
 			class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white shadow transition hover:bg-blue-700"
 		>
 			<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -109,8 +121,12 @@
 				/>
 			</svg>
 			<span>Upload</span>
-		</a>
+		</button>
 	</div>
+
+	{#if showUploadModal}
+		<UploadModal onClose={() => (showUploadModal = false)} onUploaded={loadFiles} />
+	{/if}
 
 	{#if files.length === 0}
 		<p class="text-gray-400">No files found.</p>
