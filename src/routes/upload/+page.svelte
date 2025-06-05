@@ -26,9 +26,10 @@
 			const data = await uploadFile(file, token);
 			uploadStatus = `Uploaded: ${data.filename}`;
 			setTimeout(() => goto('/'), 1500);
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error(err);
-			uploadStatus = `Upload failed: ${err.message || 'Unknown error'}`;
+			const message = (err as Error).message || '';
+			uploadStatus = `Upload failed: ${message || 'Unknown error'}`;
 		}
 	}
 </script>

@@ -11,8 +11,9 @@
 		try {
 			await login(username, password);
 			goto('/');
-		} catch (err: any) {
-			error = err.message || 'Login failed';
+		} catch (err: unknown) {
+			const message = (err as Error).message || '';
+			error = message || 'Login failed';
 		}
 	}
 </script>

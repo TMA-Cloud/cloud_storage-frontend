@@ -53,9 +53,13 @@
 		document.head.appendChild(script);
 	});
 
-	function startEditor(config: any) {
+	function startEditor(config: unknown) {
 		document.getElementById('status')!.style.display = 'none';
-		const DocsAPI = (window as typeof window & { DocsAPI: any }).DocsAPI;
+		const DocsAPI = (
+			window as typeof window & {
+				DocsAPI: { DocEditor: new (...args: unknown[]) => unknown };
+			}
+		).DocsAPI;
 		new DocsAPI.DocEditor('editor', config);
 	}
 </script>

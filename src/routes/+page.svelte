@@ -2,6 +2,7 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import ImagePreviewer from '$lib/components/ImagePreviewer.svelte';
+	import FileList from '$lib/components/FileList.svelte';
 	import {
 		fetchFiles,
 		type FileMeta,
@@ -10,7 +11,6 @@
 		openFile,
 		closePreview
 	} from '$lib/api/files';
-	import { getIconComponent } from '$lib/utils/fileIcons';
 
 	let token = '';
 	let files: FileMeta[] = [];
@@ -34,8 +34,9 @@
 					}
 				}
 			}
-		} catch (err: any) {
-			if (err.message.includes('401') || err.message.includes('403')) {
+		} catch (err: unknown) {
+			const message = (err as Error).message || '';
+			if (message.includes('401') || message.includes('403')) {
 				statusMessage = 'Session expired. Redirecting to login...';
 				localStorage.removeItem('token');
 				setTimeout(() => goto('/login'), 1000);
@@ -54,9 +55,10 @@
 			if (url) {
 				previewImage = url;
 			}
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error(err);
-			if (err.message && (err.message.includes('401') || err.message.includes('403'))) {
+			const message = (err as Error).message || '';
+			if (message.includes('401') || message.includes('403')) {
 				statusMessage = 'Session expired. Redirecting to login...';
 				localStorage.removeItem('token');
 				setTimeout(() => goto('/login'), 1000);
@@ -113,53 +115,7 @@
 	{#if files.length === 0}
 		<p class="text-gray-400">No files found.</p>
 	{:else}
-		<div class="space-y-4">
-			{#each files as file}
-				<button
-					type="button"
-					on:click={() => handleOpen(file)}
-					class="group flex w-full cursor-pointer items-center justify-between rounded-lg bg-gray-800 px-5 py-4 text-left shadow-md transition hover:bg-gray-700 hover:shadow-lg focus:outline-none"
-					aria-label={`Open ${file.filename}`}
-				>
-					<div class="flex items-center gap-4">
-						{#if isImage(file.filename)}
-							{#if thumbnails[file.id]}
-								<img
-									src={thumbnails[file.id]}
-									alt={file.filename}
-									class="h-14 w-14 rounded border object-cover shadow"
-								/>
-							{:else}
-								<div class="h-14 w-14 rounded border bg-gray-700"></div>
-							{/if}
-						{:else}
-							{@const Icon = getIconComponent(file.filename.split('.').pop() || '')}
-							<Icon class="h-14 w-14 rounded border bg-gray-700 p-2 text-white shadow" />
-						{/if}
-						<div class="space-y-1">
-							<p class="text-lg font-semibold group-hover:underline">{file.filename}</p>
-							<p class="text-sm text-gray-400">
-								Uploaded: {new Date(file.uploaded_at).toLocaleString()}
-							</p>
-							<p class="text-sm text-gray-400">Size: {(file.size / 1024).toFixed(1)} KB</p>
-							<p class="text-sm text-gray-400">
-								Modified: {new Date(file.modified_at).toLocaleString()} by {file.modified_by}
-							</p>
-						</div>
-					</div>
-					<div>
-						<svg
-							class="h-5 w-5 text-blue-400 opacity-0 transition group-hover:opacity-100"
-							fill="currentColor"
-							viewBox="0 0 24 24"
-						>
-							<path d="M14 3v2h3.59L8 14.59 9.41 16 19 6.41V10h2V3h-7z" />
-							<path d="M5 5h4V3H3v6h2V5z" />
-						</svg>
-					</div>
-				</button>
-			{/each}
-		</div>
+		<FileList {files} {thumbnails} on:open={(e) => handleOpen(e.detail)} />
 	{/if}
 
 	{#if previewImage}
