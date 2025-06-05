@@ -33,16 +33,11 @@ export async function fetchFileBlob(id: string, token: string): Promise<Blob> {
 	return res.blob();
 }
 
-// Preview a file by creating an object URL
-export async function previewFile(id: string, token: string): Promise<string> {
-	const blob = await fetchFileBlob(id, token);
-	return URL.createObjectURL(blob);
-}
-
 // Open a file in a new tab or preview it if it's an image
 export async function openFile(file: FileMeta, token: string): Promise<string | null> {
 	if (isImage(file.filename)) {
-		return previewFile(file.id, token);
+		const blob = await fetchFileBlob(file.id, token);
+		return URL.createObjectURL(blob);
 	}
 	window.open(`/file/${file.id}`, '_blank', 'noopener');
 	return null;
