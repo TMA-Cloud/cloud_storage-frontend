@@ -2,6 +2,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { isImage, type FileMeta } from '$lib/api/files';
 	import { getIconComponent } from '$lib/utils/fileIcons';
+	import ThumbnailPlaceholder from './ThumbnailPlaceholder.svelte';
 
 	export let files: FileMeta[] = [];
 	export let thumbnails: Record<string, string> = {};
@@ -44,10 +45,10 @@
 								<img
 									src={thumbnails[file.id]}
 									alt={file.filename}
-									class="h-12 w-12 rounded border object-cover"
+									class="h-14 w-14 rounded border object-cover"
 								/>
 							{:else}
-								<div class="h-12 w-12 rounded border bg-gray-700"></div>
+								<ThumbnailPlaceholder />
 							{/if}
 						{:else}
 							{@const Icon = getIconComponent(file.filename.split('.').pop() || '')}
