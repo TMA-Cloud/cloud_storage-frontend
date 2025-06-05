@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
 	import ImagePreviewer from '$lib/components/ImagePreviewer.svelte';
 	import {
@@ -70,6 +70,15 @@
 			previewImage = null;
 		}
 	}
+
+	onDestroy(() => {
+		if (previewImage) {
+			closePreview(previewImage);
+		}
+		for (const url of Object.values(thumbnails)) {
+			URL.revokeObjectURL(url);
+		}
+	});
 </script>
 
 <main class="min-h-screen bg-gray-900 p-6 text-white">
