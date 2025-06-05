@@ -17,6 +17,7 @@
 		// Dynamically load the OnlyOffice API script
 		const script = document.createElement('script');
 		script.src = ONLYOFFICE_JS_URL;
+		script.referrerPolicy = 'no-referrer';
 
 		script.onload = async () => {
 			const id = $page.params.id;

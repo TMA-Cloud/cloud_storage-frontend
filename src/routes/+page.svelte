@@ -2,14 +2,20 @@
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
 	import ImagePreviewer from '$lib/components/ImagePreviewer.svelte';
-	import { fetchFiles } from '$lib/api/files';
+	import {
+		fetchFiles,
+		type FileMeta,
+		isImage,
+		fetchFileBlob,
+		openFile,
+		closePreview
+	} from '$lib/api/files';
 	import { getIconComponent } from '$lib/utils/fileIcons';
-
-	const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 	let token = '';
 	let files: any[] = [];
 	let previewImage: string | null = null;
+	let thumbnails: Record<string, string> = {};
 	let statusMessage = '';
 
 	onMount(async () => {
@@ -18,6 +24,16 @@
 		token = raw;
 		try {
 			files = await fetchFiles(token);
+			for (const f of files) {
+				if (isImage(f.filename)) {
+					try {
+						const blob = await fetchFileBlob(f.id, token);
+						thumbnails[f.id] = URL.createObjectURL(blob);
+					} catch (e) {
+						console.error(e);
+					}
+				}
+			}
 		} catch (err: any) {
 			if (err.message.includes('401') || err.message.includes('403')) {
 				statusMessage = 'Session expired. Redirecting to login...';
@@ -29,9 +45,30 @@
 		}
 	});
 
-	function isImage(filename: string): boolean {
-		const ext = filename.split('.').pop()?.toLowerCase() || '';
-		return ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(ext);
+	async function handleOpen(file: FileMeta) {
+		try {
+			if (previewImage) {
+				closePreview(previewImage);
+			}
+			const url = await openFile(file, token);
+			if (url) {
+				previewImage = url;
+			}
+		} catch (err: any) {
+			console.error(err);
+			if (err.message && (err.message.includes('401') || err.message.includes('403'))) {
+				statusMessage = 'Session expired. Redirecting to login...';
+				localStorage.removeItem('token');
+				setTimeout(() => goto('/login'), 1000);
+			}
+		}
+	}
+
+	function handleClosePreview() {
+		if (previewImage) {
+			closePreview(previewImage);
+			previewImage = null;
+		}
 	}
 </script>
 
@@ -71,24 +108,21 @@
 			{#each files as file}
 				<button
 					type="button"
-					on:click={() => {
-						if (isImage(file.filename)) {
-							const query = token ? `?token=${encodeURIComponent(token)}` : '';
-							previewImage = `${API_BASE}/api/files/${file.id}/download${query}`;
-						} else {
-							window.open(`/file/${file.id}`, '_blank');
-						}
-					}}
+					on:click={() => handleOpen(file)}
 					class="group flex w-full cursor-pointer items-center justify-between rounded-lg bg-gray-800 px-5 py-4 text-left shadow-md transition hover:bg-gray-700 hover:shadow-lg focus:outline-none"
 					aria-label={`Open ${file.filename}`}
 				>
 					<div class="flex items-center gap-4">
 						{#if isImage(file.filename)}
-							<img
-								src={`${API_BASE}/api/files/${file.id}/download${token ? `?token=${encodeURIComponent(token)}` : ''}`}
-								alt={file.filename}
-								class="h-14 w-14 rounded border object-cover shadow"
-							/>
+							{#if thumbnails[file.id]}
+								<img
+									src={thumbnails[file.id]}
+									alt={file.filename}
+									class="h-14 w-14 rounded border object-cover shadow"
+								/>
+							{:else}
+								<div class="h-14 w-14 rounded border bg-gray-700"></div>
+							{/if}
 						{:else}
 							{@const Icon = getIconComponent(file.filename.split('.').pop() || '')}
 							<Icon class="h-14 w-14 rounded border bg-gray-700 p-2 text-white shadow" />
@@ -116,6 +150,6 @@
 	{/if}
 
 	{#if previewImage}
-		<ImagePreviewer src={previewImage} onClose={() => (previewImage = null)} />
+		<ImagePreviewer src={previewImage} onClose={handleClosePreview} />
 	{/if}
 </main>

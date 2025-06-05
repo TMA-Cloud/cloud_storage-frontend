@@ -1,14 +1,58 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+// File metadata interface
 export interface FileMeta {
 	id: string;
 	filename: string;
 	uploaded_at: string;
 }
 
+// File upload response interface
 export interface UploadResponse {
 	id: string;
 	filename: string;
 	uploaded_at: string;
+}
+
+// Check if a filename has an image extension
+export function isImage(filename: string): boolean {
+	const ext = filename.split('.').pop()?.toLowerCase() || '';
+	return ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(ext);
+}
+
+// Fetch a file as a Blob
+export async function fetchFileBlob(id: string, token: string): Promise<Blob> {
+	const res = await fetch(`${API_BASE}/api/files/${id}/download`, {
+		headers: { Authorization: `Bearer ${token}` }
+	});
+
+	if (!res.ok) {
+		throw new Error(`HTTP ${res.status}`);
+	}
+
+	return res.blob();
+}
+
+// Preview a file by creating an object URL
+export async function previewFile(id: string, token: string): Promise<string> {
+	const blob = await fetchFileBlob(id, token);
+	return URL.createObjectURL(blob);
+}
+
+// Open a file in a new tab or preview it if it's an image
+export async function openFile(file: FileMeta, token: string): Promise<string | null> {
+	if (isImage(file.filename)) {
+		return previewFile(file.id, token);
+	}
+	window.open(`/file/${file.id}`, '_blank', 'noopener');
+	return null;
+}
+
+// Close the preview by revoking the object URL
+export function closePreview(url: string | null): void {
+	if (url) {
+		URL.revokeObjectURL(url);
+	}
 }
 
 // Fetch list of files with proper return type
