@@ -29,6 +29,7 @@
 			bind:value={username}
 			class="w-full rounded border border-gray-600 bg-gray-700 p-2"
 			placeholder="Username"
+			autocomplete="username"
 			required
 		/>
 
@@ -37,6 +38,7 @@
 			bind:value={password}
 			class="w-full rounded border border-gray-600 bg-gray-700 p-2"
 			placeholder="Password"
+			autocomplete="current-password"
 			required
 		/>
 
