@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import { isImage, type FileMeta } from '$lib/api/files';
+	import { formatFileSize } from '$lib/utils/format';
 	import { getIconComponent } from '$lib/utils/fileIcons';
 	import ThumbnailPlaceholder from './ThumbnailPlaceholder.svelte';
 
@@ -60,7 +61,7 @@
 				<td class="px-4 py-3 text-sm text-gray-300"
 					>{new Date(file.uploaded_at).toLocaleString()}</td
 				>
-				<td class="px-4 py-3 text-sm text-gray-300">{(file.size / 1024).toFixed(1)} KB</td>
+				<td class="px-4 py-3 text-sm text-gray-300">{formatFileSize(file.size)}</td>
 				<td class="px-4 py-3 text-sm text-gray-300">
 					{new Date(file.modified_at).toLocaleString()} by {file.modified_by}
 				</td>
