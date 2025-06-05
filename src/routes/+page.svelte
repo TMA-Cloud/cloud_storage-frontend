@@ -136,10 +136,14 @@
 							{@const Icon = getIconComponent(file.filename.split('.').pop() || '')}
 							<Icon class="h-14 w-14 rounded border bg-gray-700 p-2 text-white shadow" />
 						{/if}
-						<div>
+						<div class="space-y-1">
 							<p class="text-lg font-semibold group-hover:underline">{file.filename}</p>
 							<p class="text-sm text-gray-400">
 								Uploaded: {new Date(file.uploaded_at).toLocaleString()}
+							</p>
+							<p class="text-sm text-gray-400">Size: {(file.size / 1024).toFixed(1)} KB</p>
+							<p class="text-sm text-gray-400">
+								Modified: {new Date(file.modified_at).toLocaleString()} by {file.modified_by}
 							</p>
 						</div>
 					</div>

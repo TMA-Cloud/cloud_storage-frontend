@@ -5,6 +5,9 @@ export interface FileMeta {
 	id: string;
 	filename: string;
 	uploaded_at: string;
+	size: number;
+	modified_by: string;
+	modified_at: string;
 }
 
 // File upload response interface
