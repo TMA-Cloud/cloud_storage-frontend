@@ -131,7 +131,7 @@
 	{#if files.length === 0}
 		<p class="text-gray-400">No files found.</p>
 	{:else}
-		<FileList {files} {thumbnails} on:open={(e) => handleOpen(e.detail)} />
+		<FileList {files} {thumbnails} {token} on:open={(e) => handleOpen(e.detail)} />
 	{/if}
 
 	{#if previewImage}

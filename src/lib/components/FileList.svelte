@@ -1,12 +1,14 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import { isImage, type FileMeta } from '$lib/api/files';
+	import { isImage, type FileMeta, downloadFile } from '$lib/api/files';
 	import { formatFileSize } from '$lib/utils/format';
 	import { getIconComponent } from '$lib/utils/fileIcons';
 	import ThumbnailPlaceholder from './ThumbnailPlaceholder.svelte';
+	import { Download } from 'lucide-svelte';
 
 	export let files: FileMeta[] = [];
 	export let thumbnails: Record<string, string> = {};
+	export let token: string;
 
 	const dispatch = createEventDispatcher<{ open: FileMeta }>();
 
@@ -20,6 +22,10 @@
 			open(file);
 		}
 	}
+
+	function handleDownload(file: FileMeta) {
+		downloadFile(file, token);
+	}
 </script>
 
 <table class="min-w-full divide-y divide-gray-700">
@@ -29,6 +35,7 @@
 			<th class="px-4 py-2">Uploaded</th>
 			<th class="px-4 py-2">Size</th>
 			<th class="px-4 py-2">Modified</th>
+			<th class="px-4 py-2 text-right">Actions</th>
 		</tr>
 	</thead>
 	<tbody class="divide-y divide-gray-700">
@@ -64,6 +71,15 @@
 				<td class="px-4 py-3 text-sm text-gray-300">{formatFileSize(file.size)}</td>
 				<td class="px-4 py-3 text-sm text-gray-300">
 					{new Date(file.modified_at).toLocaleString()} by {file.modified_by}
+				</td>
+				<td class="px-4 py-3 text-right">
+					<button
+						type="button"
+						on:click|stopPropagation={() => handleDownload(file)}
+						class="rounded p-2 hover:bg-gray-600 focus:bg-gray-600"
+					>
+						<Download class="h-5 w-5" />
+					</button>
 				</td>
 			</tr>
 		{/each}

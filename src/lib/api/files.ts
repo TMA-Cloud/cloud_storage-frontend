@@ -53,6 +53,19 @@ export function closePreview(url: string | null): void {
 	}
 }
 
+// Download a file to the user's computer
+export async function downloadFile(file: FileMeta, token: string): Promise<void> {
+	const blob = await fetchFileBlob(file.id, token);
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement('a');
+	a.href = url;
+	a.download = file.filename;
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+	URL.revokeObjectURL(url);
+}
+
 // Fetch list of files with proper return type
 export async function fetchFiles(token: string): Promise<FileMeta[]> {
 	const res = await fetch(`${API_BASE}/api/files`, {
