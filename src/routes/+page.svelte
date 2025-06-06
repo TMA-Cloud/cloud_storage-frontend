@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { getToken, clearToken } from '$lib/api/auth';
+	import { getToken, clearToken, logout } from '$lib/api/auth';
+	import { LogOut } from 'lucide-svelte';
 	import ImagePreviewer from '$lib/components/ImagePreviewer.svelte';
 	import FileList from '$lib/components/FileList.svelte';
 	import UploadModal from '$lib/components/UploadModal.svelte';
@@ -78,6 +79,23 @@
 		}
 	}
 
+	async function handleLogout() {
+		const current = getToken();
+		if (!current) {
+			goto('/login');
+			return;
+		}
+
+		try {
+			await logout(current);
+		} catch (err) {
+			console.error(err);
+		} finally {
+			clearToken();
+			goto('/login');
+		}
+	}
+
 	function handleClosePreview() {
 		if (previewImage) {
 			closePreview(previewImage);
@@ -96,12 +114,22 @@
 </script>
 
 <main class="min-h-screen bg-gray-900 p-6 text-white">
-	<h1 class="mb-8 flex items-center gap-3 text-4xl font-bold">
-		<svg class="h-8 w-8 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-			<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z" />
-		</svg>
-		<span>Your Cloud Files</span>
-	</h1>
+	<div class="mb-8 flex items-center justify-between">
+		<h1 class="flex items-center gap-3 text-4xl font-bold">
+			<svg class="h-8 w-8 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+				<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z" />
+			</svg>
+			<span>Your Cloud Files</span>
+		</h1>
+		<button
+			type="button"
+			on:click={handleLogout}
+			class="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white shadow transition hover:bg-red-700"
+		>
+			<LogOut class="h-5 w-5" />
+			<span>Logout</span>
+		</button>
+	</div>
 
 	{#if statusMessage}
 		<p class="mb-4 text-center text-red-400">{statusMessage}</p>

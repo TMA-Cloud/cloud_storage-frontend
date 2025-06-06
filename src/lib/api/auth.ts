@@ -49,3 +49,24 @@ export function getToken(): string | null {
 export function clearToken(): void {
 	document.cookie = 'token=; Max-Age=0; path=/';
 }
+
+// Call backend to invalidate session token
+export async function logout(token: string): Promise<void> {
+	const res = await fetch(`${API_BASE}/api/logout`, {
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${token}`
+		}
+	});
+
+	if (!res.ok) {
+		let msg = `HTTP ${res.status}`;
+		try {
+			const err = await res.json();
+			msg = err.error || msg;
+		} catch {
+			msg += ' (invalid JSON)';
+		}
+		throw new Error(msg);
+	}
+}
