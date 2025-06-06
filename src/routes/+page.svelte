@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { getToken, clearToken, logout } from '$lib/api/auth';
-	import { LogOut } from 'lucide-svelte';
+	import { getToken, clearToken } from '$lib/api/auth';
 	import ImagePreviewer from '$lib/components/ImagePreviewer.svelte';
 	import FileList from '$lib/components/FileList.svelte';
 	import UploadModal from '$lib/components/UploadModal.svelte';
+	import UserProfileModal from '$lib/components/UserProfileModal.svelte';
 	import {
 		fetchFiles,
 		type FileMeta,
@@ -21,6 +21,7 @@
 	let thumbnails: Record<string, string> = {};
 	let statusMessage = '';
 	let showUploadModal = false;
+	let showProfileModal = false;
 
 	async function loadFiles() {
 		try {
@@ -79,23 +80,6 @@
 		}
 	}
 
-	async function handleLogout() {
-		const current = getToken();
-		if (!current) {
-			goto('/login');
-			return;
-		}
-
-		try {
-			await logout(current);
-		} catch (err) {
-			console.error(err);
-		} finally {
-			clearToken();
-			goto('/login');
-		}
-	}
-
 	function handleClosePreview() {
 		if (previewImage) {
 			closePreview(previewImage);
@@ -121,14 +105,15 @@
 			</svg>
 			<span>Your Cloud Files</span>
 		</h1>
-		<button
-			type="button"
-			on:click={handleLogout}
-			class="flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 font-semibold text-white shadow transition hover:bg-red-700"
-		>
-			<LogOut class="h-5 w-5" />
-			<span>Logout</span>
-		</button>
+		<div class="flex gap-3">
+			<button
+				type="button"
+				on:click={() => (showProfileModal = true)}
+				class="rounded-lg bg-gray-700 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-gray-600"
+			>
+				Profile
+			</button>
+		</div>
 	</div>
 
 	{#if statusMessage}
@@ -165,5 +150,9 @@
 
 	{#if previewImage}
 		<ImagePreviewer src={previewImage} onClose={handleClosePreview} />
+	{/if}
+
+	{#if showProfileModal}
+		<UserProfileModal {token} onClose={() => (showProfileModal = false)} />
 	{/if}
 </main>
