@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { uploadFile } from '$lib/api/files';
+	import { getToken } from '$lib/api/auth';
 
 	export let onClose: () => void;
 	export let onUploaded: () => void = () => {};
@@ -12,7 +13,7 @@
 	let uploading = false;
 
 	onMount(() => {
-		const saved = localStorage.getItem('token');
+		const saved = getToken();
 		if (!saved) {
 			uploadStatus = 'No token found. Please login first.';
 		} else {

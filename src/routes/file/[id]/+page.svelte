@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { onMount, tick } from 'svelte';
+	import { getToken, clearToken } from '$lib/api/auth';
 
 	const API_BASE = import.meta.env.VITE_API_BASE_URL;
 	const ONLYOFFICE_JS_URL = import.meta.env.VITE_ONLYOFFICE_JS_URL;
@@ -19,7 +20,7 @@
 
 		script.onload = async () => {
 			const id = $page.params.id;
-			const token = localStorage.getItem('token');
+			const token = getToken();
 
 			const res = await fetch(`${API_BASE}/api/files/${id}/onlyoffice`, {
 				headers: {
@@ -28,7 +29,7 @@
 			});
 
 			if (res.status === 401 || res.status === 403) {
-				localStorage.removeItem('token');
+				clearToken();
 				document.getElementById('status')!.textContent = 'Session expired. Redirecting to login...';
 				setTimeout(() => goto('/login'), 1000);
 				return;

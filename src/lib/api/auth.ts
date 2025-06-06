@@ -37,6 +37,15 @@ export async function login(username: string, password: string): Promise<string>
 		throw new Error(data.error || 'Login failed');
 	}
 
-	localStorage.setItem('token', data.token);
+	document.cookie = `token=${data.token}; path=/`;
 	return data.token;
+}
+
+export function getToken(): string | null {
+	const match = document.cookie.match(/(?:^|; )token=([^;]+)/);
+	return match ? decodeURIComponent(match[1]) : null;
+}
+
+export function clearToken(): void {
+	document.cookie = 'token=; Max-Age=0; path=/';
 }

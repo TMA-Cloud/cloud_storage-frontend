@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { goto } from '$app/navigation';
+	import { getToken, clearToken } from '$lib/api/auth';
 	import ImagePreviewer from '$lib/components/ImagePreviewer.svelte';
 	import FileList from '$lib/components/FileList.svelte';
 	import UploadModal from '$lib/components/UploadModal.svelte';
@@ -42,7 +43,7 @@
 			const message = (err as Error).message || '';
 			if (message.includes('401') || message.includes('403')) {
 				statusMessage = 'Session expired. Redirecting to login...';
-				localStorage.removeItem('token');
+				clearToken();
 				setTimeout(() => goto('/login'), 1000);
 			} else {
 				console.error(err);
@@ -51,7 +52,7 @@
 	}
 
 	onMount(async () => {
-		const raw = localStorage.getItem('token');
+		const raw = getToken();
 		if (!raw) return;
 		token = raw;
 		await loadFiles();
@@ -71,7 +72,7 @@
 			const message = (err as Error).message || '';
 			if (message.includes('401') || message.includes('403')) {
 				statusMessage = 'Session expired. Redirecting to login...';
-				localStorage.removeItem('token');
+				clearToken();
 				setTimeout(() => goto('/login'), 1000);
 			}
 		}
