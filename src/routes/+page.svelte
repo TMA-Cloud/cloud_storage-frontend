@@ -104,7 +104,7 @@
 			<svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
 				<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z" />
 			</svg>
-			<span>Your Cloud Files</span>
+			<span>TMA Cloud</span>
 		</h1>
 		<div class="flex items-center gap-3">
 			<button
