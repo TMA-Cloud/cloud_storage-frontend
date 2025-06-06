@@ -22,8 +22,7 @@
 	});
 
 	async function handleUpload() {
-		if (uploading) return;
-		if (!file || !token) {
+		if (uploading || !file || !token) {
 			uploadStatus = 'Missing file or token';
 			return;
 		}
@@ -32,7 +31,7 @@
 
 		try {
 			const data = await uploadFile(file, token);
-			uploadStatus = `Uploaded: ${data.filename}`;
+			uploadStatus = `✅ Uploaded: ${data.filename}`;
 			onUploaded();
 			setTimeout(() => {
 				uploading = false;
@@ -41,7 +40,7 @@
 		} catch (err: unknown) {
 			console.error(err);
 			const message = (err as Error).message || '';
-			uploadStatus = `Upload failed: ${message || 'Unknown error'}`;
+			uploadStatus = `❌ Upload failed: ${message || 'Unknown error'}`;
 			uploading = false;
 		}
 	}
@@ -65,47 +64,48 @@
 	}
 
 	function handleKey(event: KeyboardEvent) {
-		if (event.key === 'Escape') {
-			onClose();
-		}
+		if (event.key === 'Escape') onClose();
 	}
 </script>
 
-<!-- Modal wrapper with keyboard focus -->
+<!-- Modal Overlay -->
 <div
 	tabindex="0"
 	role="dialog"
 	aria-modal="true"
 	aria-label="Upload file modal"
 	on:keydown={handleKey}
-	class="fixed inset-0 z-50 flex items-center justify-center"
+	class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
 >
-	<!-- Backdrop as actual <button> to dismiss modal -->
+	<!-- Dismiss Background -->
 	<button
 		type="button"
 		aria-label="Dismiss upload modal"
-		class="absolute inset-0 cursor-default bg-black/80 backdrop-blur-sm"
+		class="absolute inset-0"
 		on:click={onClose}
 	></button>
 
-	<!-- Modal content -->
+	<!-- Modal Card -->
 	<div
 		role="document"
-		class="relative z-10 w-full max-w-lg overflow-hidden rounded-lg bg-white p-6 text-gray-800 shadow-xl"
+		class="relative z-10 w-full max-w-md rounded-2xl bg-[#27282E] p-6 text-white shadow-2xl transition-all duration-300"
 	>
-		<h2 class="mb-4 text-xl font-semibold">Upload files</h2>
+		<h2 class="mb-5 text-xl font-bold text-white">📤 Upload a File</h2>
+
+		<!-- Dropzone -->
 		<div
 			role="button"
 			tabindex="0"
 			aria-label="File dropzone"
-			class="flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-gray-300 p-8 text-center"
-			class:border-blue-500={dropActive}
+			class={`flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed p-8 text-center transition ${
+				dropActive ? 'border-blue-500 bg-blue-500/10' : 'border-gray-600 hover:border-blue-400'
+			}`}
 			on:drop={handleDrop}
 			on:dragover={handleDragOver}
 			on:dragleave={handleDragLeave}
 		>
 			<svg
-				class="h-12 w-12 text-gray-400"
+				class="h-12 w-12 text-blue-400"
 				fill="none"
 				stroke="currentColor"
 				stroke-width="2"
@@ -117,12 +117,12 @@
 					d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2m-6-12v12m0 0l-4-4m4 4l4-4"
 				/>
 			</svg>
-			<p class="text-sm text-gray-600">Drag files here</p>
-			<span class="text-sm text-gray-500">or</span>
+			<p class="text-sm font-medium text-gray-300">Drag & drop your file here</p>
+			<span class="text-xs text-gray-500">or</span>
 			<label
-				class="cursor-pointer rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+				class="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
 			>
-				Select file
+				Browse Files
 				<input
 					type="file"
 					on:change={(e) => (file = (e.target as HTMLInputElement).files?.[0] || null)}
@@ -131,14 +131,16 @@
 				/>
 			</label>
 			{#if file}
-				<p class="mt-1 text-sm text-gray-700">{file.name}</p>
+				<p class="mt-1 text-sm font-medium text-gray-200">📄 {file.name}</p>
 			{/if}
 		</div>
-		<div class="mt-6 flex justify-end gap-3">
+
+		<!-- Action Buttons -->
+		<div class="mt-6 flex justify-end gap-2">
 			<button
 				type="button"
 				on:click={onClose}
-				class="rounded px-4 py-2 text-sm text-gray-700 hover:bg-gray-200"
+				class="rounded-lg px-4 py-2 text-sm text-gray-300 transition hover:bg-gray-700"
 			>
 				Cancel
 			</button>
@@ -146,15 +148,10 @@
 				type="button"
 				on:click={handleUpload}
 				disabled={uploading || !file}
-				class="flex items-center gap-2 rounded bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
+				class="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{#if uploading}
-					<svg
-						class="h-4 w-4 animate-spin"
-						viewBox="0 0 24 24"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-					>
+					<svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
 						<circle
 							class="opacity-25"
 							cx="12"
@@ -175,8 +172,10 @@
 				{/if}
 			</button>
 		</div>
+
+		<!-- Upload Status -->
 		{#if uploadStatus}
-			<p class="mt-4 text-center text-sm text-gray-600">{uploadStatus}</p>
+			<p class="mt-4 text-center text-sm text-gray-400">{uploadStatus}</p>
 		{/if}
 	</div>
 </div>

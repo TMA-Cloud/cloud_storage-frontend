@@ -97,55 +97,67 @@
 	});
 </script>
 
-<main class="min-h-screen bg-gray-900 p-6 text-white">
-	<div class="mb-8 flex items-center justify-between">
-		<h1 class="flex items-center gap-3 text-4xl font-bold">
-			<svg class="h-8 w-8 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+<main class="min-h-screen bg-[#1E1F23] px-6 py-6 font-sans text-[#F3F4F6]">
+	<!-- Top Header -->
+	<div class="mb-10 flex items-center justify-between border-b border-[#2E2F35] pb-5">
+		<h1 class="flex items-center gap-3 text-3xl font-bold tracking-tight text-amber-300">
+			<svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
 				<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z" />
 			</svg>
 			<span>Your Cloud Files</span>
 		</h1>
-		<div class="flex gap-3">
+		<div class="flex items-center gap-3">
 			<button
-				type="button"
-				on:click={() => (showProfileModal = true)}
-				class="rounded-lg bg-gray-700 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-gray-600"
+				on:click={() => (showUploadModal = true)}
+				class="inline-flex items-center gap-2 rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-blue-600"
 			>
-				Profile
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 12V4m0 0L8 8m4-4l4 4"
+					/>
+				</svg>
+				<span>Upload</span>
+			</button>
+			<button
+				on:click={() => (showProfileModal = true)}
+				class="inline-flex items-center gap-2 rounded-md border border-[#444] bg-[#27282E] px-4 py-2 text-sm text-gray-300 transition hover:bg-[#333]"
+			>
+				<svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M5.121 17.804A9 9 0 1119.78 4.222a9 9 0 01-14.657 13.582z"
+					/>
+				</svg>
+				<span>Profile</span>
 			</button>
 		</div>
 	</div>
 
+	<!-- Error or Status -->
 	{#if statusMessage}
-		<p class="mb-4 text-center text-red-400">{statusMessage}</p>
-	{/if}
-
-	<!-- Upload button -->
-	<div class="mb-6 flex justify-end">
-		<button
-			type="button"
-			on:click={() => (showUploadModal = true)}
-			class="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white shadow transition hover:bg-blue-700"
+		<p
+			class="mb-6 rounded border border-red-500/30 bg-red-500/10 px-4 py-2 text-center text-red-300 shadow-sm"
 		>
-			<svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-				<path
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 12V4m0 0L8 8m4-4l4 4"
-				/>
-			</svg>
-			<span>Upload</span>
-		</button>
-	</div>
-
-	{#if showUploadModal}
-		<UploadModal onClose={() => (showUploadModal = false)} onUploaded={loadFiles} />
+			{statusMessage}
+		</p>
 	{/if}
 
+	<!-- File List -->
 	{#if files.length === 0}
-		<p class="text-gray-400">No files found.</p>
+		<div class="mt-20 text-center text-gray-500">
+			<p class="text-xl font-semibold">No files yet</p>
+			<p class="mt-1 text-sm text-gray-400">Click "Upload" to get started</p>
+		</div>
 	{:else}
 		<FileList {files} {thumbnails} {token} on:open={(e) => handleOpen(e.detail)} />
+	{/if}
+
+	<!-- Modals -->
+	{#if showUploadModal}
+		<UploadModal onClose={() => (showUploadModal = false)} onUploaded={loadFiles} />
 	{/if}
 
 	{#if previewImage}
