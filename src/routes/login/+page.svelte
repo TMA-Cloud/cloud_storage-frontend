@@ -18,34 +18,41 @@
 	}
 </script>
 
-<main class="flex min-h-screen items-center justify-center bg-gray-900 text-white">
+<main class="flex min-h-screen items-center justify-center bg-[#1E1F23] px-4 text-white">
 	<form
 		on:submit|preventDefault={handleLogin}
-		class="w-full max-w-sm space-y-4 rounded-lg bg-gray-800 p-6 shadow-md"
+		class="w-full max-w-sm space-y-6 rounded-2xl bg-[#27282E] p-8 shadow-xl"
 	>
-		<h2 class="text-center text-xl font-bold">Login</h2>
+		<h2 class="text-center text-2xl font-bold text-white">🔐 Sign In</h2>
 
-		<input
-			bind:value={username}
-			class="w-full rounded border border-gray-600 bg-gray-700 p-2"
-			placeholder="Username"
-			autocomplete="username"
-			required
-		/>
+		<div class="space-y-3">
+			<input
+				bind:value={username}
+				class="w-full rounded-lg border border-gray-600 bg-[#1E1F23] px-4 py-2 text-sm text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+				placeholder="Username"
+				autocomplete="username"
+				required
+			/>
 
-		<input
-			type="password"
-			bind:value={password}
-			class="w-full rounded border border-gray-600 bg-gray-700 p-2"
-			placeholder="Password"
-			autocomplete="current-password"
-			required
-		/>
+			<input
+				type="password"
+				bind:value={password}
+				class="w-full rounded-lg border border-gray-600 bg-[#1E1F23] px-4 py-2 text-sm text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+				placeholder="Password"
+				autocomplete="current-password"
+				required
+			/>
+		</div>
 
 		{#if error}
 			<p class="text-center text-sm text-red-400">{error}</p>
 		{/if}
 
-		<button class="w-full rounded bg-blue-600 py-2 font-semibold hover:bg-blue-700">Login</button>
+		<button
+			type="submit"
+			class="w-full rounded-lg bg-blue-600 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 focus:ring-2 focus:ring-blue-400 focus:outline-none"
+		>
+			Login
+		</button>
 	</form>
 </main>
