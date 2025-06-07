@@ -129,3 +129,22 @@ export async function uploadFile(file: File, token: string): Promise<UploadRespo
 	}
 	return data;
 }
+
+// Delete a file by ID
+export async function deleteFile(id: string, token: string): Promise<void> {
+	const res = await fetch(`${API_BASE}/api/files/${id}`, {
+		method: 'DELETE',
+		headers: { Authorization: `Bearer ${token}` }
+	});
+
+	if (!res.ok) {
+		let msg = `HTTP ${res.status}`;
+		try {
+			const err = await res.json();
+			msg = err.error || msg;
+		} catch {
+			msg += ' (invalid JSON)';
+		}
+		throw new Error(msg);
+	}
+}

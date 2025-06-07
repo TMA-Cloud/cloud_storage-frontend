@@ -6,13 +6,15 @@
 	import FileList from '$lib/components/FileList.svelte';
 	import UploadModal from '$lib/components/UploadModal.svelte';
 	import UserProfileModal from '$lib/components/UserProfileModal.svelte';
+	import ConfirmModal from '$lib/components/ConfirmModal.svelte';
 	import {
 		fetchFiles,
 		type FileMeta,
 		isImage,
 		fetchFileBlob,
 		openFile,
-		closePreview
+		closePreview,
+		deleteFile
 	} from '$lib/api/files';
 
 	let token = '';
@@ -22,6 +24,7 @@
 	let statusMessage = '';
 	let showUploadModal = false;
 	let showProfileModal = false;
+	let fileToDelete: FileMeta | null = null;
 
 	async function loadFiles() {
 		try {
@@ -152,7 +155,13 @@
 			<p class="mt-1 text-sm text-gray-400">Click "Upload" to get started</p>
 		</div>
 	{:else}
-		<FileList {files} {thumbnails} {token} on:open={(e) => handleOpen(e.detail)} />
+		<FileList
+			{files}
+			{thumbnails}
+			{token}
+			on:open={(e) => handleOpen(e.detail)}
+			on:delete={(e) => (fileToDelete = e.detail)}
+		/>
 	{/if}
 
 	<!-- Modals -->
@@ -162,6 +171,19 @@
 
 	{#if previewImage}
 		<ImagePreviewer src={previewImage} onClose={handleClosePreview} />
+	{/if}
+
+	{#if fileToDelete}
+		<ConfirmModal
+			message={`Are you sure you want to delete ${fileToDelete.filename}?`}
+			onConfirm={async () => {
+				if (!fileToDelete) return;
+				await deleteFile(fileToDelete.id, token);
+				await loadFiles();
+				fileToDelete = null;
+			}}
+			onCancel={() => (fileToDelete = null)}
+		/>
 	{/if}
 
 	{#if showProfileModal}

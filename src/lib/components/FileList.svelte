@@ -4,13 +4,13 @@
 	import { formatFileSize } from '$lib/utils/format';
 	import { getIconComponent } from '$lib/utils/fileIcons';
 	import ThumbnailPlaceholder from './ThumbnailPlaceholder.svelte';
-	import { Download } from 'lucide-svelte';
+	import { Download, Trash2 } from 'lucide-svelte';
 
 	export let files: FileMeta[] = [];
 	export let thumbnails: Record<string, string> = {};
 	export let token: string;
 
-	const dispatch = createEventDispatcher<{ open: FileMeta }>();
+	const dispatch = createEventDispatcher<{ open: FileMeta; delete: FileMeta }>();
 
 	function open(file: FileMeta) {
 		dispatch('open', file);
@@ -25,6 +25,10 @@
 
 	function handleDownload(file: FileMeta) {
 		downloadFile(file, token);
+	}
+
+	function requestDelete(file: FileMeta) {
+		dispatch('delete', file);
 	}
 </script>
 
@@ -72,13 +76,22 @@
 				<td class="px-4 py-3 text-sm text-gray-300">
 					{new Date(file.modified_at).toLocaleString()} by {file.modified_by}
 				</td>
-				<td class="px-4 py-3 text-right">
+				<td class="flex justify-end gap-2 px-4 py-3 text-right">
 					<button
 						type="button"
 						on:click|stopPropagation={() => handleDownload(file)}
 						class="rounded p-2 hover:bg-gray-600 focus:bg-gray-600"
+						aria-label="Download {file.filename}"
 					>
 						<Download class="h-5 w-5" />
+					</button>
+					<button
+						type="button"
+						on:click|stopPropagation={() => requestDelete(file)}
+						class="rounded p-2 hover:bg-red-600 focus:bg-red-600"
+						aria-label="Delete {file.filename}"
+					>
+						<Trash2 class="h-5 w-5" />
 					</button>
 				</td>
 			</tr>
