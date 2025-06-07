@@ -10,11 +10,20 @@ export interface FileMeta {
 	modified_at: string;
 }
 
-// File upload response interface
-export interface UploadResponse {
+// Information returned for each uploaded file
+export interface UploadedFile {
 	id: string;
 	filename: string;
-	uploaded_at: string;
+	size: number;
+	owner: string;
+	modified_by: string;
+	modified_at: string;
+}
+
+// Upload response containing metadata about all files
+export interface UploadResponse {
+	message: string;
+	files: UploadedFile[];
 }
 
 // Check if a filename has an image extension
@@ -105,10 +114,16 @@ export async function fetchFiles(token: string, page = 1): Promise<FilesPage> {
 	return data;
 }
 
-// Upload a file
-export async function uploadFile(file: File, token: string): Promise<UploadResponse> {
+// Upload multiple files. For a single file, provide an array with one element.
+export async function uploadFiles(files: File[], token: string): Promise<UploadResponse> {
 	const form = new FormData();
-	form.append('file', file);
+	for (const f of files) {
+		form.append('files', f);
+	}
+	if (files.length === 1) {
+		// keep backward compatibility with server
+		form.append('file', files[0]);
+	}
 
 	const res = await fetch(`${API_BASE}/api/files/upload`, {
 		method: 'POST',
@@ -131,11 +146,16 @@ export async function uploadFile(file: File, token: string): Promise<UploadRespo
 
 	let data: UploadResponse;
 	try {
-		data = await res.json();
+		data = (await res.json()) as UploadResponse;
 	} catch {
 		throw new Error('Failed to parse upload response');
 	}
 	return data;
+}
+
+// Convenience wrapper for uploading a single file
+export async function uploadFile(file: File, token: string): Promise<UploadResponse> {
+	return uploadFiles([file], token);
 }
 
 // Delete a file by ID

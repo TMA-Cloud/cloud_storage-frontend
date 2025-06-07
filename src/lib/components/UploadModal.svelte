@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { uploadFile } from '$lib/api/files';
+	import { uploadFiles } from '$lib/api/files';
 	import { getToken } from '$lib/api/auth';
 
 	export let onClose: () => void;
 	export let onUploaded: () => void = () => {};
 
-	let file: File | null = null;
+	let files: File[] = [];
 	let token = '';
 	let uploadStatus = '';
 	let dropActive = false;
@@ -22,16 +22,18 @@
 	});
 
 	async function handleUpload() {
-		if (uploading || !file || !token) {
-			uploadStatus = 'Missing file or token';
+		if (uploading || files.length === 0 || !token) {
+			uploadStatus = 'Missing files or token';
 			return;
 		}
 
 		uploading = true;
 
 		try {
-			const data = await uploadFile(file, token);
-			uploadStatus = `✅ Uploaded: ${data.filename}`;
+			const data = await uploadFiles(files, token);
+			const count = data.files.length;
+			const names = data.files.map((f) => f.filename).join(', ');
+			uploadStatus = `✅ Uploaded ${count} file${count === 1 ? '' : 's'}: ${names}`;
 			onUploaded();
 			setTimeout(() => {
 				uploading = false;
@@ -48,7 +50,7 @@
 	function handleDrop(event: DragEvent) {
 		event.preventDefault();
 		if (event.dataTransfer?.files.length) {
-			file = event.dataTransfer.files[0];
+			files = Array.from(event.dataTransfer.files);
 		}
 		dropActive = false;
 	}
@@ -73,7 +75,7 @@
 	tabindex="0"
 	role="dialog"
 	aria-modal="true"
-	aria-label="Upload file modal"
+	aria-label="Upload files modal"
 	on:keydown={handleKey}
 	class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
 >
@@ -90,7 +92,7 @@
 		role="document"
 		class="relative z-10 w-full max-w-md rounded-2xl bg-[#27282E] p-6 text-white shadow-2xl transition-all duration-300"
 	>
-		<h2 class="mb-5 text-xl font-bold text-white">📤 Upload a File</h2>
+		<h2 class="mb-5 text-xl font-bold text-white">📤 Upload Files</h2>
 
 		<!-- Dropzone -->
 		<div
@@ -117,7 +119,7 @@
 					d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2m-6-12v12m0 0l-4-4m4 4l4-4"
 				/>
 			</svg>
-			<p class="text-sm font-medium text-gray-300">Drag & drop your file here</p>
+			<p class="text-sm font-medium text-gray-300">Drag & drop your files here</p>
 			<span class="text-xs text-gray-500">or</span>
 			<label
 				class="cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
@@ -125,13 +127,18 @@
 				Browse Files
 				<input
 					type="file"
-					on:change={(e) => (file = (e.target as HTMLInputElement).files?.[0] || null)}
+					multiple
+					on:change={(e) => (files = Array.from((e.target as HTMLInputElement).files || []))}
 					disabled={uploading}
 					class="hidden"
 				/>
 			</label>
-			{#if file}
-				<p class="mt-1 text-sm font-medium text-gray-200">📄 {file.name}</p>
+			{#if files.length}
+				<ul class="mt-1 space-y-1 text-sm font-medium text-gray-200">
+					{#each files as f}
+						<li>📄 {f.name}</li>
+					{/each}
+				</ul>
 			{/if}
 		</div>
 
@@ -147,7 +154,7 @@
 			<button
 				type="button"
 				on:click={handleUpload}
-				disabled={uploading || !file}
+				disabled={uploading || files.length === 0}
 				class="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
 			>
 				{#if uploading}
