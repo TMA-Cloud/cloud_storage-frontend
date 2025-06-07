@@ -19,6 +19,8 @@
 
 	let token = '';
 	let files: FileMeta[] = [];
+	let currentPage = 1;
+	let hasNextPage = false;
 	let previewImage: string | null = null;
 	let thumbnails: Record<string, string> = {};
 	let statusMessage = '';
@@ -26,9 +28,11 @@
 	let showProfileModal = false;
 	let fileToDelete: FileMeta | null = null;
 
-	async function loadFiles() {
+	async function loadFiles(page: number = currentPage) {
 		try {
-			const newFiles = await fetchFiles(token);
+			const { files: newFiles, has_next } = await fetchFiles(token, page);
+			currentPage = page;
+			hasNextPage = has_next;
 			for (const url of Object.values(thumbnails)) {
 				URL.revokeObjectURL(url);
 			}
@@ -162,6 +166,25 @@
 			on:open={(e) => handleOpen(e.detail)}
 			on:delete={(e) => (fileToDelete = e.detail)}
 		/>
+		<div class="mt-4 flex items-center justify-center gap-2">
+			<button
+				type="button"
+				class="rounded border border-[#444] bg-[#27282E] px-3 py-1 text-sm transition hover:bg-[#333] disabled:opacity-50"
+				on:click={() => loadFiles(currentPage - 1)}
+				disabled={currentPage === 1}
+			>
+				Prev
+			</button>
+			<span class="text-sm">Page {currentPage}</span>
+			<button
+				type="button"
+				class="rounded border border-[#444] bg-[#27282E] px-3 py-1 text-sm transition hover:bg-[#333] disabled:opacity-50"
+				on:click={() => loadFiles(currentPage + 1)}
+				disabled={!hasNextPage}
+			>
+				Next
+			</button>
+		</div>
 	{/if}
 
 	<!-- Modals -->

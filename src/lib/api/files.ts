@@ -67,8 +67,16 @@ export async function downloadFile(file: FileMeta, token: string): Promise<void>
 }
 
 // Fetch list of files with proper return type
-export async function fetchFiles(token: string): Promise<FileMeta[]> {
-	const res = await fetch(`${API_BASE}/api/files`, {
+export interface FilesPage {
+	files: FileMeta[];
+	has_next: boolean;
+}
+
+export async function fetchFiles(token: string, page = 1): Promise<FilesPage> {
+	const url = new URL(`${API_BASE}/api/files`);
+	url.searchParams.set('page', String(page));
+
+	const res = await fetch(url.toString(), {
 		headers: { Authorization: `Bearer ${token}` }
 	});
 
@@ -87,9 +95,9 @@ export async function fetchFiles(token: string): Promise<FileMeta[]> {
 		throw new Error(msg);
 	}
 
-	let data: FileMeta[];
+	let data: FilesPage;
 	try {
-		data = await res.json();
+		data = (await res.json()) as FilesPage;
 	} catch {
 		throw new Error('Failed to parse files list');
 	}
