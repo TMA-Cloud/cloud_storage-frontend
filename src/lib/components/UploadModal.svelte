@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { uploadFiles } from '$lib/api/files';
 	import { getToken } from '$lib/api/auth';
+	import { X } from 'lucide-svelte';
 
 	export let onClose: () => void;
 	export let onUploaded: () => void = () => {};
@@ -63,6 +64,10 @@
 	function handleDragLeave(event: DragEvent) {
 		event.preventDefault();
 		dropActive = false;
+	}
+
+	function removeFile(index: number) {
+		files = files.filter((_, i) => i !== index);
 	}
 
 	function handleKey(event: KeyboardEvent) {
@@ -135,8 +140,19 @@
 			</label>
 			{#if files.length}
 				<ul class="mt-1 space-y-1 text-sm font-medium text-gray-200">
-					{#each files as f}
-						<li>📄 {f.name}</li>
+					{#each files as f, i (i)}
+						<li class="flex items-center gap-2">
+							<span>📄 {f.name}</span>
+							<button
+								type="button"
+								on:click={() => removeFile(i)}
+								disabled={uploading}
+								aria-label={`Remove ${f.name}`}
+								class="rounded p-1 hover:bg-gray-600 focus:bg-gray-600"
+							>
+								<X class="h-4 w-4" />
+							</button>
+						</li>
 					{/each}
 				</ul>
 			{/if}
