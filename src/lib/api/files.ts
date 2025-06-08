@@ -10,6 +10,11 @@ export interface FileMeta {
 	modified_at: string;
 }
 
+export interface SearchFileMeta extends FileMeta {
+	url: string;
+	owner: string;
+}
+
 // Information returned for each uploaded file
 export interface UploadedFile {
 	id: string;
@@ -175,4 +180,37 @@ export async function deleteFile(id: string, token: string): Promise<void> {
 		}
 		throw new Error(msg);
 	}
+}
+
+export async function searchFiles(query: string, token: string): Promise<SearchFileMeta[]> {
+	const url = new URL(`${API_BASE}/api/files/search`);
+	url.searchParams.set('q', query);
+
+	const res = await fetch(url.toString(), {
+		headers: { Authorization: `Bearer ${token}` }
+	});
+
+	if (res.status === 401 || res.status === 403) {
+		throw new Error(`HTTP ${res.status}`);
+	}
+
+	if (!res.ok) {
+		let msg = `HTTP ${res.status}`;
+		try {
+			const err = await res.json();
+			msg = err.error || msg;
+		} catch {
+			msg += ' (invalid JSON)';
+		}
+		throw new Error(msg);
+	}
+
+	let data: { files: SearchFileMeta[] };
+	try {
+		data = (await res.json()) as { files: SearchFileMeta[] };
+	} catch {
+		throw new Error('Failed to parse search results');
+	}
+
+	return data.files;
 }

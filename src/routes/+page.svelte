@@ -9,6 +9,7 @@
 	import ConfirmModal from '$lib/components/ConfirmModal.svelte';
 	import {
 		fetchFiles,
+		searchFiles,
 		type FileMeta,
 		isImage,
 		fetchFileBlob,
@@ -27,6 +28,9 @@
 	let showUploadModal = false;
 	let showProfileModal = false;
 	let fileToDelete: FileMeta | null = null;
+	let searchQuery = '';
+	let searchActive = false;
+	let searching = false;
 
 	async function loadFiles(page: number = currentPage) {
 		try {
@@ -94,6 +98,57 @@
 		}
 	}
 
+	async function performSearch() {
+		if (!searchQuery.trim()) return;
+		searching = true;
+		try {
+			const results = await searchFiles(searchQuery, token);
+			searchActive = true;
+			hasNextPage = false;
+			currentPage = 1;
+			for (const url of Object.values(thumbnails)) {
+				URL.revokeObjectURL(url);
+			}
+			thumbnails = {};
+			files = results;
+			for (const f of files) {
+				if (isImage(f.filename)) {
+					try {
+						const blob = await fetchFileBlob(f.id, token);
+						thumbnails[f.id] = URL.createObjectURL(blob);
+					} catch (e) {
+						console.error(e);
+					}
+				}
+			}
+		} catch (err: unknown) {
+			const message = (err as Error).message || '';
+			if (message.includes('401') || message.includes('403')) {
+				statusMessage = 'Session expired. Redirecting to login...';
+				clearToken();
+				setTimeout(() => goto('/login'), 1000);
+			} else {
+				statusMessage = 'Search failed';
+				console.error(err);
+			}
+		} finally {
+			searching = false;
+		}
+	}
+
+	async function clearSearch() {
+		searchQuery = '';
+		searchActive = false;
+		statusMessage = '';
+		await loadFiles(1);
+	}
+
+	function handleSearchInput() {
+		if (!searchQuery.trim() && searchActive && !searching) {
+			clearSearch();
+		}
+	}
+
 	onDestroy(() => {
 		if (previewImage) {
 			closePreview(previewImage);
@@ -113,7 +168,32 @@
 			</svg>
 			<span>TMA Cloud</span>
 		</h1>
-		<div class="flex items-center gap-3">
+		<div class="flex flex-wrap items-center gap-3">
+			<input
+				type="search"
+				placeholder="Search files"
+				bind:value={searchQuery}
+				class="rounded border border-[#444] bg-[#27282E] px-3 py-1 text-sm text-gray-200 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+				on:keydown={(e) => e.key === 'Enter' && performSearch()}
+				on:input={handleSearchInput}
+			/>
+			<button
+				type="button"
+				on:click={performSearch}
+				class="rounded-md border border-[#444] bg-[#27282E] px-3 py-1 text-sm text-gray-300 transition hover:bg-[#333] disabled:opacity-50"
+				disabled={searching}
+			>
+				Search
+			</button>
+			{#if searchActive}
+				<button
+					type="button"
+					on:click={clearSearch}
+					class="rounded-md border border-[#444] bg-[#27282E] px-3 py-1 text-sm text-gray-300 transition hover:bg-[#333]"
+				>
+					Clear
+				</button>
+			{/if}
 			<button
 				on:click={() => (showUploadModal = true)}
 				class="inline-flex items-center gap-2 rounded-md bg-blue-500 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-blue-600"
@@ -152,11 +232,17 @@
 		</p>
 	{/if}
 
+	{#if searchActive && searchQuery}
+		<p class="mb-4 text-sm text-gray-400">Results for "{searchQuery}"</p>
+	{/if}
+
 	<!-- File List -->
 	{#if files.length === 0}
 		<div class="mt-20 text-center text-gray-500">
-			<p class="text-xl font-semibold">No files yet</p>
-			<p class="mt-1 text-sm text-gray-400">Click "Upload" to get started</p>
+			<p class="text-xl font-semibold">{searchActive ? 'No matching files' : 'No files yet'}</p>
+			<p class="mt-1 text-sm text-gray-400">
+				{searchActive ? 'Try another search' : 'Click "Upload" to get started'}
+			</p>
 		</div>
 	{:else}
 		<FileList
@@ -166,25 +252,27 @@
 			on:open={(e) => handleOpen(e.detail)}
 			on:delete={(e) => (fileToDelete = e.detail)}
 		/>
-		<div class="mt-4 flex items-center justify-center gap-2">
-			<button
-				type="button"
-				class="rounded border border-[#444] bg-[#27282E] px-3 py-1 text-sm transition hover:bg-[#333] disabled:opacity-50"
-				on:click={() => loadFiles(currentPage - 1)}
-				disabled={currentPage === 1}
-			>
-				Prev
-			</button>
-			<span class="text-sm">Page {currentPage}</span>
-			<button
-				type="button"
-				class="rounded border border-[#444] bg-[#27282E] px-3 py-1 text-sm transition hover:bg-[#333] disabled:opacity-50"
-				on:click={() => loadFiles(currentPage + 1)}
-				disabled={!hasNextPage}
-			>
-				Next
-			</button>
-		</div>
+		{#if !searchActive}
+			<div class="mt-4 flex items-center justify-center gap-2">
+				<button
+					type="button"
+					class="rounded border border-[#444] bg-[#27282E] px-3 py-1 text-sm transition hover:bg-[#333] disabled:opacity-50"
+					on:click={() => loadFiles(currentPage - 1)}
+					disabled={currentPage === 1}
+				>
+					Prev
+				</button>
+				<span class="text-sm">Page {currentPage}</span>
+				<button
+					type="button"
+					class="rounded border border-[#444] bg-[#27282E] px-3 py-1 text-sm transition hover:bg-[#333] disabled:opacity-50"
+					on:click={() => loadFiles(currentPage + 1)}
+					disabled={!hasNextPage}
+				>
+					Next
+				</button>
+			</div>
+		{/if}
 	{/if}
 
 	<!-- Modals -->
