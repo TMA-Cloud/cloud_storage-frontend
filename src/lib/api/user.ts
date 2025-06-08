@@ -26,7 +26,7 @@ export async function fetchUserProfile(token: string): Promise<UserProfile> {
 		throw new Error(msg);
 	}
 
-	let data: { 'User ID': string; 'User Name': string; 'Full Name': string };
+	let data: { id: string; username: string; name: string };
 	try {
 		data = await res.json();
 	} catch {
@@ -34,8 +34,8 @@ export async function fetchUserProfile(token: string): Promise<UserProfile> {
 	}
 
 	return {
-		id: data['User ID'],
-		username: data['User Name'],
-		name: data['Full Name']
+		id: data['id'],
+		username: data['username'],
+		name: data['name']
 	};
 }
