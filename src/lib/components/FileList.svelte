@@ -33,6 +33,8 @@
 			const message = (err as Error).message || '';
 			if (message.includes('403')) {
 				showOwnerError = true;
+			} else if (message.includes('404')) {
+				statusNotFoundError = true;
 			}
 		}
 	}
@@ -42,6 +44,7 @@
 	}
 
 	let showOwnerError = false;
+	let statusNotFoundError = false;
 	let toastMessage = '';
 	let toastTimer: ReturnType<typeof setTimeout>;
 	let openMenu: string | null = null;
@@ -66,6 +69,8 @@
 			const message = (err as Error).message || '';
 			if (message.includes('403')) {
 				showOwnerError = true;
+			} else if (message.includes('404')) {
+				statusNotFoundError = true;
 			}
 		}
 	}
@@ -185,6 +190,12 @@
 	<AlertModal
 		message="You are not the owner of this file."
 		onClose={() => (showOwnerError = false)}
+	/>
+{/if}
+{#if statusNotFoundError}
+	<AlertModal
+		message="The requested file was not found."
+		onClose={() => (statusNotFoundError = false)}
 	/>
 {/if}
 {#if toastMessage}

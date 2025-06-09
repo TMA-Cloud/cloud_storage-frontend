@@ -33,6 +33,7 @@
 	let searchActive = false;
 	let searching = false;
 	let showOwnerError = false;
+	let statusNotFoundError = false;
 
 	async function loadFiles(page: number = currentPage) {
 		try {
@@ -91,6 +92,8 @@
 				setTimeout(() => goto('/login'), 1000);
 			} else if (message.includes('403')) {
 				showOwnerError = true;
+			} else if (message.includes('404')) {
+				statusNotFoundError = true;
 			}
 		}
 	}
@@ -302,7 +305,11 @@
 					const message = (err as Error).message || '';
 					if (message.includes('403')) {
 						showOwnerError = true;
+					} else if (message.includes('404')) {
+						statusNotFoundError = true;
 					}
+				} finally {
+					fileToDelete = null;
 				}
 			}}
 			onCancel={() => (fileToDelete = null)}
@@ -317,6 +324,13 @@
 		<AlertModal
 			message="You are not the owner of this file."
 			onClose={() => (showOwnerError = false)}
+		/>
+	{/if}
+
+	{#if statusNotFoundError}
+		<AlertModal
+			message="The requested file was not found."
+			onClose={() => (statusNotFoundError = false)}
 		/>
 	{/if}
 </main>
