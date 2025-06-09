@@ -25,8 +25,16 @@
 		}
 	}
 
-	function handleDownload(file: FileMeta) {
-		downloadFile(file, token);
+	async function handleDownload(file: FileMeta) {
+		try {
+			await downloadFile(file, token);
+		} catch (err) {
+			console.error(err);
+			const message = (err as Error).message || '';
+			if (message.includes('403')) {
+				showOwnerError = true;
+			}
+		}
 	}
 
 	function requestDelete(file: FileMeta) {

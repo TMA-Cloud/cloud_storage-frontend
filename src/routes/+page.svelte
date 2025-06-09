@@ -7,6 +7,7 @@
 	import UploadModal from '$lib/components/UploadModal.svelte';
 	import UserProfileModal from '$lib/components/UserProfileModal.svelte';
 	import ConfirmModal from '$lib/components/ConfirmModal.svelte';
+	import AlertModal from '$lib/components/AlertModal.svelte';
 	import {
 		fetchFiles,
 		searchFiles,
@@ -31,6 +32,7 @@
 	let searchQuery = '';
 	let searchActive = false;
 	let searching = false;
+	let showOwnerError = false;
 
 	async function loadFiles(page: number = currentPage) {
 		try {
@@ -83,10 +85,12 @@
 		} catch (err: unknown) {
 			console.error(err);
 			const message = (err as Error).message || '';
-			if (message.includes('401') || message.includes('403')) {
+			if (message.includes('401')) {
 				statusMessage = 'Session expired. Redirecting to login...';
 				clearToken();
 				setTimeout(() => goto('/login'), 1000);
+			} else if (message.includes('403')) {
+				showOwnerError = true;
 			}
 		}
 	}
@@ -289,9 +293,17 @@
 			message={`Are you sure you want to delete ${fileToDelete.filename}?`}
 			onConfirm={async () => {
 				if (!fileToDelete) return;
-				await deleteFile(fileToDelete.id, token);
-				await loadFiles();
-				fileToDelete = null;
+				try {
+					await deleteFile(fileToDelete.id, token);
+					await loadFiles();
+					fileToDelete = null;
+				} catch (err) {
+					console.error(err);
+					const message = (err as Error).message || '';
+					if (message.includes('403')) {
+						showOwnerError = true;
+					}
+				}
 			}}
 			onCancel={() => (fileToDelete = null)}
 		/>
@@ -299,5 +311,12 @@
 
 	{#if showProfileModal}
 		<UserProfileModal {token} onClose={() => (showProfileModal = false)} />
+	{/if}
+
+	{#if showOwnerError}
+		<AlertModal
+			message="You are not the owner of this file."
+			onClose={() => (showOwnerError = false)}
+		/>
 	{/if}
 </main>
