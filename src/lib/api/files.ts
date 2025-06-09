@@ -231,6 +231,11 @@ export async function searchFiles(query: string, token: string): Promise<SearchF
 		throw new Error(`HTTP ${res.status}`);
 	}
 
+	// Treat empty or not-found as no result
+	if (res.status === 404 || res.status === 204) {
+		return [];
+	}
+
 	if (!res.ok) {
 		let msg = `HTTP ${res.status}`;
 		try {
@@ -242,12 +247,18 @@ export async function searchFiles(query: string, token: string): Promise<SearchF
 		throw new Error(msg);
 	}
 
+	// Safe parse check
+	const text = await res.text();
+	if (!text) {
+		return [];
+	}
+
 	let data: { files: SearchFileMeta[] };
 	try {
-		data = (await res.json()) as { files: SearchFileMeta[] };
+		data = JSON.parse(text);
 	} catch {
 		throw new Error('Failed to parse search results');
 	}
 
-	return data.files;
+	return data.files || [];
 }

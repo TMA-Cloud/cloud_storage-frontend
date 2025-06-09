@@ -111,6 +111,7 @@
 		try {
 			const results = await searchFiles(searchQuery, token);
 			searchActive = true;
+			statusMessage = '';
 			hasNextPage = false;
 			currentPage = 1;
 			for (const url of Object.values(thumbnails)) {
@@ -135,7 +136,15 @@
 				clearToken();
 				setTimeout(() => goto('/login'), 1000);
 			} else {
-				statusMessage = 'Search failed';
+				statusMessage = 'Error searching files';
+				searchActive = true;
+				hasNextPage = false;
+				currentPage = 1;
+				for (const url of Object.values(thumbnails)) {
+					URL.revokeObjectURL(url);
+				}
+				thumbnails = {};
+				files = [];
 				console.error(err);
 			}
 		} finally {
