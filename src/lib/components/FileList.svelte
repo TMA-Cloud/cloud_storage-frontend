@@ -82,9 +82,9 @@
 	<thead class="bg-gray-800 text-left text-sm text-gray-400 uppercase">
 		<tr>
 			<th class="px-4 py-2">File</th>
-			<th class="px-4 py-2">Uploaded</th>
-			<th class="px-4 py-2">Size</th>
 			<th class="px-4 py-2">Owner</th>
+			<th class="px-4 py-2">Size</th>
+			<th class="px-4 py-2">Uploaded</th>
 			<th class="px-4 py-2">Modified</th>
 			<th class="px-4 py-2 text-right">Actions</th>
 		</tr>
@@ -121,11 +121,11 @@
 						</span>
 					</div>
 				</td>
+				<td class="px-4 py-3 text-sm text-gray-300">{file.owner}</td>
+				<td class="px-4 py-3 text-sm text-gray-300">{formatFileSize(file.size)}</td>
 				<td class="px-4 py-3 text-sm text-gray-300"
 					>{new Date(file.uploaded_at).toLocaleString()}</td
 				>
-				<td class="px-4 py-3 text-sm text-gray-300">{formatFileSize(file.size)}</td>
-				<td class="px-4 py-3 text-sm text-gray-300">{file.owner}</td>
 				<td class="px-4 py-3 text-sm text-gray-300">
 					{new Date(file.modified_at).toLocaleString()} by {file.modified_by}
 				</td>
