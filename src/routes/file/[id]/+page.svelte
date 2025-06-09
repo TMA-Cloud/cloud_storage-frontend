@@ -36,8 +36,21 @@
 			}
 
 			if (!res.ok) {
-				const err = await res.text();
-				document.getElementById('status')!.textContent = err;
+				let msg = 'Failed to load the document.';
+				if (res.status === 404) {
+					msg = 'This file is either deleted or private.';
+				} else if (res.status === 500) {
+					msg = 'Server error while fetching the document.';
+				} else {
+					const err = await res.text();
+					try {
+						const parsed = JSON.parse(err);
+						msg = parsed.message || msg;
+					} catch {
+						msg = err || msg;
+					}
+				}
+				document.getElementById('status')!.textContent = msg;
 				return;
 			}
 
