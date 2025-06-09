@@ -6,6 +6,7 @@ export interface FileMeta {
 	filename: string;
 	uploaded_at: string;
 	size: number;
+	owner: string;
 	modified_by: string;
 	modified_at: string;
 	is_private: boolean;
@@ -13,7 +14,6 @@ export interface FileMeta {
 
 export interface SearchFileMeta extends FileMeta {
 	url: string;
-	owner: string;
 }
 
 // Information returned for each uploaded file

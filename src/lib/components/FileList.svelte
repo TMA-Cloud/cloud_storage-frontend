@@ -4,7 +4,7 @@
 	import { formatFileSize } from '$lib/utils/format';
 	import { getIconComponent } from '$lib/utils/fileIcons';
 	import ThumbnailPlaceholder from './ThumbnailPlaceholder.svelte';
-	import { Download, Trash2, Lock, Unlock } from 'lucide-svelte';
+	import { Download, Trash2, Lock, Unlock, MoreVertical } from 'lucide-svelte';
 	import AlertModal from './AlertModal.svelte';
 	import Toast from './Toast.svelte';
 
@@ -44,6 +44,11 @@
 	let showOwnerError = false;
 	let toastMessage = '';
 	let toastTimer: ReturnType<typeof setTimeout>;
+	let openMenu: string | null = null;
+
+	function toggleMenu(id: string) {
+		openMenu = openMenu === id ? null : id;
+	}
 
 	function showToast(message: string) {
 		toastMessage = message;
@@ -66,12 +71,15 @@
 	}
 </script>
 
+<svelte:window on:click={() => (openMenu = null)} />
+
 <table class="min-w-full divide-y divide-gray-700">
 	<thead class="bg-gray-800 text-left text-sm text-gray-400 uppercase">
 		<tr>
 			<th class="px-4 py-2">File</th>
 			<th class="px-4 py-2">Uploaded</th>
 			<th class="px-4 py-2">Size</th>
+			<th class="px-4 py-2">Owner</th>
 			<th class="px-4 py-2">Modified</th>
 			<th class="px-4 py-2 text-right">Actions</th>
 		</tr>
@@ -112,10 +120,11 @@
 					>{new Date(file.uploaded_at).toLocaleString()}</td
 				>
 				<td class="px-4 py-3 text-sm text-gray-300">{formatFileSize(file.size)}</td>
+				<td class="px-4 py-3 text-sm text-gray-300">{file.owner}</td>
 				<td class="px-4 py-3 text-sm text-gray-300">
 					{new Date(file.modified_at).toLocaleString()} by {file.modified_by}
 				</td>
-				<td class="flex justify-end gap-2 px-4 py-3 text-right">
+				<td class="relative flex justify-end gap-2 px-4 py-3 text-right">
 					<button
 						type="button"
 						on:click|stopPropagation={() => handleDownload(file)}
@@ -126,26 +135,47 @@
 					</button>
 					<button
 						type="button"
-						on:click|stopPropagation={() => togglePrivacy(file)}
+						on:click|stopPropagation={() => toggleMenu(file.id)}
 						class="rounded p-2 hover:bg-gray-600 focus:bg-gray-600"
-						aria-label={file.is_private
-							? `Make ${file.filename} public`
-							: `Make ${file.filename} private`}
+						aria-label="More actions"
 					>
-						{#if file.is_private}
-							<Lock class="h-5 w-5" />
-						{:else}
-							<Unlock class="h-5 w-5" />
-						{/if}
+						<MoreVertical class="h-5 w-5" />
 					</button>
-					<button
-						type="button"
-						on:click|stopPropagation={() => requestDelete(file)}
-						class="rounded p-2 hover:bg-red-600 focus:bg-red-600"
-						aria-label="Delete {file.filename}"
-					>
-						<Trash2 class="h-5 w-5" />
-					</button>
+					{#if openMenu === file.id}
+						<div class="absolute right-0 z-20 mt-2 w-40 rounded-md bg-[#27282E] shadow-lg">
+							<button
+								type="button"
+								on:click|stopPropagation={() => {
+									togglePrivacy(file);
+									openMenu = null;
+								}}
+								class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-200 hover:bg-gray-600"
+								aria-label={file.is_private
+									? `Make ${file.filename} public`
+									: `Make ${file.filename} private`}
+							>
+								{#if file.is_private}
+									<Unlock class="h-4 w-4" />
+									<span>Make Public</span>
+								{:else}
+									<Lock class="h-4 w-4" />
+									<span>Make Private</span>
+								{/if}
+							</button>
+							<button
+								type="button"
+								on:click|stopPropagation={() => {
+									requestDelete(file);
+									openMenu = null;
+								}}
+								class="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-600 hover:text-white"
+								aria-label="Delete {file.filename}"
+							>
+								<Trash2 class="h-4 w-4" />
+								<span>Delete</span>
+							</button>
+						</div>
+					{/if}
 				</td>
 			</tr>
 		{/each}
