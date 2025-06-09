@@ -12,6 +12,7 @@
 	let uploadStatus = '';
 	let dropActive = false;
 	let uploading = false;
+	let privateUpload = false;
 
 	onMount(() => {
 		const saved = getToken();
@@ -31,7 +32,7 @@
 		uploading = true;
 
 		try {
-			const data = await uploadFiles(files, token);
+			const data = await uploadFiles(files, token, privateUpload);
 			const count = data.files.length;
 			const names = data.files.map((f) => f.filename).join(', ');
 			uploadStatus = `✅ Uploaded ${count} file${count === 1 ? '' : 's'}: ${names}`;
@@ -156,6 +157,16 @@
 					{/each}
 				</ul>
 			{/if}
+		</div>
+
+		<div class="mt-4 flex items-center gap-2">
+			<input
+				id="private-upload"
+				type="checkbox"
+				bind:checked={privateUpload}
+				class="h-4 w-4 rounded border-gray-600 bg-gray-800 text-blue-600 focus:ring-blue-500"
+			/>
+			<label for="private-upload" class="text-sm text-gray-300">Private upload</label>
 		</div>
 
 		<!-- Action Buttons -->

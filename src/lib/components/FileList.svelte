@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import { isImage, type FileMeta, downloadFile } from '$lib/api/files';
+	import { isImage, type FileMeta, downloadFile, updateFilePrivacy } from '$lib/api/files';
 	import { formatFileSize } from '$lib/utils/format';
 	import { getIconComponent } from '$lib/utils/fileIcons';
 	import ThumbnailPlaceholder from './ThumbnailPlaceholder.svelte';
-	import { Download, Trash2 } from 'lucide-svelte';
+	import { Download, Trash2, Lock, Unlock } from 'lucide-svelte';
+	import AlertModal from './AlertModal.svelte';
+	import Toast from './Toast.svelte';
 
 	export let files: FileMeta[] = [];
 	export let thumbnails: Record<string, string> = {};
@@ -29,6 +31,30 @@
 
 	function requestDelete(file: FileMeta) {
 		dispatch('delete', file);
+	}
+
+	let showOwnerError = false;
+	let toastMessage = '';
+	let toastTimer: ReturnType<typeof setTimeout>;
+
+	function showToast(message: string) {
+		toastMessage = message;
+		clearTimeout(toastTimer);
+		toastTimer = setTimeout(() => (toastMessage = ''), 4000);
+	}
+
+	async function togglePrivacy(file: FileMeta) {
+		try {
+			await updateFilePrivacy(file.id, !file.is_private, token);
+			files = files.map((f) => (f.id === file.id ? { ...f, is_private: !file.is_private } : f));
+			showToast(!file.is_private ? 'File is now private' : 'File is now public');
+		} catch (err) {
+			console.error(err);
+			const message = (err as Error).message || '';
+			if (message.includes('403')) {
+				showOwnerError = true;
+			}
+		}
 	}
 </script>
 
@@ -66,7 +92,12 @@
 							{@const Icon = getIconComponent(file.filename.split('.').pop() || '')}
 							<Icon class="h-12 w-12 rounded border bg-gray-700 p-2 text-white" />
 						{/if}
-						<span class="font-semibold hover:underline">{file.filename}</span>
+						<span class="flex items-center gap-1 font-semibold hover:underline">
+							{file.filename}
+							{#if file.is_private}
+								<Lock class="h-4 w-4 text-gray-400" />
+							{/if}
+						</span>
 					</div>
 				</td>
 				<td class="px-4 py-3 text-sm text-gray-300"
@@ -87,6 +118,20 @@
 					</button>
 					<button
 						type="button"
+						on:click|stopPropagation={() => togglePrivacy(file)}
+						class="rounded p-2 hover:bg-gray-600 focus:bg-gray-600"
+						aria-label={file.is_private
+							? `Make ${file.filename} public`
+							: `Make ${file.filename} private`}
+					>
+						{#if file.is_private}
+							<Lock class="h-5 w-5" />
+						{:else}
+							<Unlock class="h-5 w-5" />
+						{/if}
+					</button>
+					<button
+						type="button"
 						on:click|stopPropagation={() => requestDelete(file)}
 						class="rounded p-2 hover:bg-red-600 focus:bg-red-600"
 						aria-label="Delete {file.filename}"
@@ -98,3 +143,12 @@
 		{/each}
 	</tbody>
 </table>
+{#if showOwnerError}
+	<AlertModal
+		message="You are not the owner of this file."
+		onClose={() => (showOwnerError = false)}
+	/>
+{/if}
+{#if toastMessage}
+	<Toast message={toastMessage} />
+{/if}

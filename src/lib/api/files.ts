@@ -8,6 +8,7 @@ export interface FileMeta {
 	size: number;
 	modified_by: string;
 	modified_at: string;
+	is_private: boolean;
 }
 
 export interface SearchFileMeta extends FileMeta {
@@ -23,6 +24,7 @@ export interface UploadedFile {
 	owner: string;
 	modified_by: string;
 	modified_at: string;
+	is_private: boolean;
 }
 
 // Upload response containing metadata about all files
@@ -120,7 +122,11 @@ export async function fetchFiles(token: string, page = 1): Promise<FilesPage> {
 }
 
 // Upload multiple files. For a single file, provide an array with one element.
-export async function uploadFiles(files: File[], token: string): Promise<UploadResponse> {
+export async function uploadFiles(
+	files: File[],
+	token: string,
+	isPrivate = false
+): Promise<UploadResponse> {
 	const form = new FormData();
 	for (const f of files) {
 		form.append('files', f);
@@ -129,6 +135,7 @@ export async function uploadFiles(files: File[], token: string): Promise<UploadR
 		// keep backward compatibility with server
 		form.append('file', files[0]);
 	}
+	form.append('private', isPrivate ? '1' : '0');
 
 	const res = await fetch(`${API_BASE}/api/files/upload`, {
 		method: 'POST',
@@ -159,8 +166,12 @@ export async function uploadFiles(files: File[], token: string): Promise<UploadR
 }
 
 // Convenience wrapper for uploading a single file
-export async function uploadFile(file: File, token: string): Promise<UploadResponse> {
-	return uploadFiles([file], token);
+export async function uploadFile(
+	file: File,
+	token: string,
+	isPrivate = false
+): Promise<UploadResponse> {
+	return uploadFiles([file], token, isPrivate);
 }
 
 // Delete a file by ID
@@ -168,6 +179,32 @@ export async function deleteFile(id: string, token: string): Promise<void> {
 	const res = await fetch(`${API_BASE}/api/files/${id}`, {
 		method: 'DELETE',
 		headers: { Authorization: `Bearer ${token}` }
+	});
+
+	if (!res.ok) {
+		let msg = `HTTP ${res.status}`;
+		try {
+			const err = await res.json();
+			msg = err.error || msg;
+		} catch {
+			msg += ' (invalid JSON)';
+		}
+		throw new Error(msg);
+	}
+}
+
+export async function updateFilePrivacy(
+	id: string,
+	isPrivate: boolean,
+	token: string
+): Promise<void> {
+	const res = await fetch(`${API_BASE}/api/files/${id}/privacy`, {
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${token}`,
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ private: isPrivate })
 	});
 
 	if (!res.ok) {
