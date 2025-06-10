@@ -11,6 +11,7 @@
 	export let files: FileMeta[] = [];
 	export let thumbnails: Record<string, string> = {};
 	export let token: string;
+	export let headerOffset: number = 0;
 
 	const dispatch = createEventDispatcher<{
 		open: FileMeta;
@@ -242,7 +243,10 @@
 		></div>
 	{/if}
 	<table class="min-w-full divide-y divide-gray-700">
-		<thead class="bg-gray-800 text-left text-sm text-gray-400 uppercase">
+		<thead
+			class="sticky z-10 bg-gray-800 text-left text-sm text-gray-400 uppercase"
+			style="top: {headerOffset}px"
+		>
 			<tr>
 				<th class="px-4 py-2">File</th>
 				<th class="px-4 py-2">Owner</th>

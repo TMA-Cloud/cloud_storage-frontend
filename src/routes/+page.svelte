@@ -39,6 +39,7 @@
 	let searching = false;
 	let showOwnerError = false;
 	let statusNotFoundError = false;
+	let headerHeight = 0;
 
 	async function loadFiles(page: number = currentPage) {
 		try {
@@ -164,7 +165,10 @@
 
 <main class="min-h-screen bg-[#1E1F23] px-6 py-6 font-sans text-[#F3F4F6] select-none">
 	<!-- Top Header -->
-	<div class="mb-10 flex items-center justify-between border-b border-[#2E2F35] pb-5">
+	<div
+		class="sticky top-0 z-10 mb-10 flex items-center justify-between border-b border-[#2E2F35] bg-[#1E1F23] py-3"
+		bind:clientHeight={headerHeight}
+	>
 		<h1 class="flex items-center gap-3 text-3xl font-bold tracking-tight text-amber-300">
 			<svg class="h-8 w-8" fill="currentColor" viewBox="0 0 24 24">
 				<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2z" />
@@ -264,6 +268,7 @@
 			{files}
 			{thumbnails}
 			{token}
+			headerOffset={headerHeight}
 			on:open={(e) => handleOpen(e.detail)}
 			on:delete={(e) => (fileToDelete = e.detail)}
 			on:selection={(e) => (selectedIds = e.detail)}
