@@ -162,7 +162,7 @@
 	});
 </script>
 
-<main class="min-h-screen bg-[#1E1F23] px-6 py-6 font-sans text-[#F3F4F6]">
+<main class="min-h-screen bg-[#1E1F23] px-6 py-6 font-sans text-[#F3F4F6] select-none">
 	<!-- Top Header -->
 	<div class="mb-10 flex items-center justify-between border-b border-[#2E2F35] pb-5">
 		<h1 class="flex items-center gap-3 text-3xl font-bold tracking-tight text-amber-300">
