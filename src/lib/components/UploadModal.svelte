@@ -83,7 +83,7 @@
 <Modal {onClose} ariaLabel="Upload files modal">
 	<div
 		role="document"
-		class="relative z-10 w-full max-w-md rounded-2xl bg-[#27282E] p-6 text-white shadow-2xl transition-all duration-300"
+		class="relative z-10 max-h-[90vh] w-full max-w-md overflow-y-auto rounded-2xl bg-[#27282E] p-6 text-white shadow-2xl transition-all duration-300 [scrollbar-color:#4B5563_#1F2937] [scrollbar-width:thin] dark:[scrollbar-color:#6B7280_#111827]"
 	>
 		<h2 class="mb-5 text-xl font-bold text-white">📤 Upload Files</h2>
 
@@ -127,7 +127,9 @@
 				/>
 			</label>
 			{#if files.length}
-				<ul class="mt-1 space-y-1 text-sm font-medium text-gray-200">
+				<ul
+					class="mt-1 max-h-40 w-full space-y-1 overflow-y-auto text-sm font-medium text-gray-200 [scrollbar-color:#4B5563_#1F2937] [scrollbar-width:thin] dark:[scrollbar-color:#6B7280_#111827]"
+				>
 					{#each files as f, i (i)}
 						<li class="flex items-center gap-2">
 							<span class="max-w-xs truncate" title={f.name}>📄 {f.name}</span>
