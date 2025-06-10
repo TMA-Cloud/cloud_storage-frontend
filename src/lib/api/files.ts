@@ -49,6 +49,17 @@ export async function fetchFileBlob(id: string, token: string): Promise<Blob> {
 	return res.blob();
 }
 
+// Fetch a thumbnail as a Blob. Returns null if the thumbnail does not exist
+export async function fetchThumbnailBlob(id: string): Promise<Blob | null> {
+	const res = await apiFetch(`${API_BASE}/api/files/${id}/thumbnail`, {}, [404]);
+
+	if (res.status === 404) {
+		return null;
+	}
+
+	return res.blob();
+}
+
 // Open a file in a new tab or preview it if it's an image
 export async function openFile(file: FileMeta, token: string): Promise<string | null> {
 	if (isImage(file.filename)) {

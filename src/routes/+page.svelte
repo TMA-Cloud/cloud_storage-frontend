@@ -45,7 +45,7 @@
 			}
 			thumbnails = {};
 			files = newFiles;
-			thumbnails = await buildThumbnails(files, token);
+			thumbnails = await buildThumbnails(files);
 		} catch (err: unknown) {
 			if (err instanceof UnauthorizedError) {
 				statusMessage = 'Session expired. Redirecting to login...';
@@ -111,7 +111,7 @@
 			}
 			thumbnails = {};
 			files = results;
-			thumbnails = await buildThumbnails(files, token);
+			thumbnails = await buildThumbnails(files);
 		} catch (err: unknown) {
 			if (err instanceof UnauthorizedError) {
 				statusMessage = 'Session expired. Redirecting to login...';

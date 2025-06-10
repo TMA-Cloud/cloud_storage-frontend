@@ -1,15 +1,16 @@
-import { fetchFileBlob, isImage, type FileMeta } from '$lib/api/files';
+import { fetchThumbnailBlob, isImage, type FileMeta } from '$lib/api/files';
 
-export async function buildThumbnails(
-	files: FileMeta[],
-	token: string
-): Promise<Record<string, string>> {
+export async function buildThumbnails(files: FileMeta[]): Promise<Record<string, string>> {
 	const map: Record<string, string> = {};
 	for (const f of files) {
 		if (isImage(f.filename)) {
 			try {
-				const blob = await fetchFileBlob(f.id, token);
-				map[f.id] = URL.createObjectURL(blob);
+				const blob = await fetchThumbnailBlob(f.id);
+				if (blob) {
+					map[f.id] = URL.createObjectURL(blob);
+				} else {
+					console.debug(`Thumbnail missing for ${f.id}`);
+				}
 			} catch (e) {
 				console.error(e);
 			}
