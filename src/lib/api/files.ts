@@ -164,6 +164,25 @@ export async function deleteFile(id: string, token: string): Promise<void> {
 	});
 }
 
+export async function deleteFiles(ids: string[], token: string): Promise<string[]> {
+	if (ids.length === 0) return [];
+	const res = await apiFetch(`${API_BASE}/api/files`, {
+		method: 'DELETE',
+		headers: {
+			Authorization: `Bearer ${token}`,
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ ids })
+	});
+
+	try {
+		const data = (await res.json()) as { deleted: string[] };
+		return data.deleted || [];
+	} catch {
+		return [];
+	}
+}
+
 export async function updateFilePrivacy(
 	id: string,
 	isPrivate: boolean,

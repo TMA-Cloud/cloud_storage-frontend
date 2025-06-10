@@ -8,13 +8,15 @@
 	import UserProfileModal from '$lib/components/UserProfileModal.svelte';
 	import ConfirmModal from '$lib/components/ConfirmModal.svelte';
 	import AlertModal from '$lib/components/AlertModal.svelte';
+	import { Trash2 } from 'lucide-svelte';
 	import {
 		fetchFiles,
 		searchFiles,
 		type FileMeta,
 		openFile,
 		closePreview,
-		deleteFile
+		deleteFile,
+		deleteFiles
 	} from '$lib/api/files';
 	import { UnauthorizedError } from '$lib/api/http';
 	import { buildThumbnails } from '$lib/utils/thumbnails';
@@ -29,6 +31,9 @@
 	let showUploadModal = false;
 	let showProfileModal = false;
 	let fileToDelete: FileMeta | null = null;
+	let selectedIds: string[] = [];
+	let bulkDeleteIds: string[] = [];
+	let confirmBulk = false;
 	let searchQuery = '';
 	let searchActive = false;
 	let searching = false;
@@ -218,6 +223,18 @@
 				</svg>
 				<span>Profile</span>
 			</button>
+			{#if selectedIds.length > 0}
+				<button
+					on:click={() => {
+						bulkDeleteIds = [...selectedIds];
+						confirmBulk = true;
+					}}
+					class="inline-flex items-center gap-2 rounded-md border border-red-500 bg-red-600/20 px-4 py-2 text-sm text-red-200 transition hover:bg-red-600 hover:text-white"
+				>
+					<Trash2 class="h-4 w-4" />
+					<span>Delete Selected</span>
+				</button>
+			{/if}
 		</div>
 	</div>
 
@@ -249,6 +266,7 @@
 			{token}
 			on:open={(e) => handleOpen(e.detail)}
 			on:delete={(e) => (fileToDelete = e.detail)}
+			on:selection={(e) => (selectedIds = e.detail)}
 		/>
 		{#if !searchActive}
 			<div class="mt-4 flex items-center justify-center gap-2">
@@ -310,6 +328,33 @@
 				}
 			}}
 			onCancel={() => (fileToDelete = null)}
+		/>
+	{/if}
+
+	{#if confirmBulk}
+		<ConfirmModal
+			message={`Delete ${bulkDeleteIds.length} selected files?`}
+			onConfirm={async () => {
+				try {
+					await deleteFiles(bulkDeleteIds, token);
+					selectedIds = [];
+					await loadFiles();
+				} catch (err) {
+					console.error(err);
+					if (err instanceof UnauthorizedError) {
+						statusMessage = 'Session expired. Redirecting to login...';
+						clearToken();
+						setTimeout(() => goto('/login'), 1000);
+					}
+				} finally {
+					confirmBulk = false;
+					bulkDeleteIds = [];
+				}
+			}}
+			onCancel={() => {
+				confirmBulk = false;
+				bulkDeleteIds = [];
+			}}
 		/>
 	{/if}
 
