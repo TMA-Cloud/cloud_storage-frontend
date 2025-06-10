@@ -1,32 +1,15 @@
 <script lang="ts">
+	import Modal from './Modal.svelte';
 	export let src: string;
 	export let onClose: () => void;
-
-	function handleKey(event: KeyboardEvent) {
-		if (event.key === 'Escape') {
-			onClose();
-		}
-	}
 </script>
 
 <!-- Modal wrapper with keyboard focus -->
-<div
-	tabindex="0"
-	role="dialog"
-	aria-modal="true"
-	aria-label="Image preview modal"
-	on:keydown={handleKey}
-	class="fixed inset-0 z-50 flex items-center justify-center"
+<Modal
+	{onClose}
+	ariaLabel="Image preview modal"
+	backdropClass="cursor-default bg-black/80 backdrop-blur-sm"
 >
-	<!-- Backdrop as actual <button> to dismiss modal -->
-	<button
-		type="button"
-		aria-label="Dismiss image preview"
-		class="absolute inset-0 cursor-default bg-black/80 backdrop-blur-sm"
-		on:click={onClose}
-	></button>
-
-	<!-- Modal content -->
 	<div
 		role="document"
 		class="relative z-10 rounded border border-gray-700 bg-gray-900/90 p-4 shadow-xl"
@@ -41,4 +24,4 @@
 			&times;
 		</button>
 	</div>
-</div>
+</Modal>

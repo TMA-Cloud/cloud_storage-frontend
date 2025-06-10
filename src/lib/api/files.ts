@@ -1,4 +1,5 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+import { API_BASE } from './config';
+import { apiFetch } from './http';
 
 // File metadata interface
 export interface FileMeta {
@@ -41,13 +42,9 @@ export function isImage(filename: string): boolean {
 
 // Fetch a file as a Blob
 export async function fetchFileBlob(id: string, token: string): Promise<Blob> {
-	const res = await fetch(`${API_BASE}/api/files/${id}/download`, {
+	const res = await apiFetch(`${API_BASE}/api/files/${id}/download`, {
 		headers: { Authorization: `Bearer ${token}` }
 	});
-
-	if (!res.ok) {
-		throw new Error(`HTTP ${res.status}`);
-	}
 
 	return res.blob();
 }
@@ -92,24 +89,9 @@ export async function fetchFiles(token: string, page = 1): Promise<FilesPage> {
 	const url = new URL(`${API_BASE}/api/files`);
 	url.searchParams.set('page', String(page));
 
-	const res = await fetch(url.toString(), {
+	const res = await apiFetch(url.toString(), {
 		headers: { Authorization: `Bearer ${token}` }
 	});
-
-	if (res.status === 401 || res.status === 403) {
-		throw new Error(`HTTP ${res.status}`);
-	}
-
-	if (!res.ok) {
-		let msg = `HTTP ${res.status}`;
-		try {
-			const err = await res.json();
-			msg = err.error || msg;
-		} catch {
-			msg += ' (invalid JSON)';
-		}
-		throw new Error(msg);
-	}
 
 	let data: FilesPage;
 	try {
@@ -137,24 +119,13 @@ export async function uploadFiles(
 	}
 	form.append('private', isPrivate ? '1' : '0');
 
-	const res = await fetch(`${API_BASE}/api/files/upload`, {
+	const res = await apiFetch(`${API_BASE}/api/files/upload`, {
 		method: 'POST',
 		headers: {
 			Authorization: `Bearer ${token}`
 		},
 		body: form
 	});
-
-	if (!res.ok) {
-		let msg = `HTTP ${res.status}`;
-		try {
-			const err = await res.json();
-			msg = err.error || msg;
-		} catch {
-			msg += ' (invalid JSON)';
-		}
-		throw new Error(msg);
-	}
 
 	let data: UploadResponse;
 	try {
@@ -176,21 +147,10 @@ export async function uploadFile(
 
 // Delete a file by ID
 export async function deleteFile(id: string, token: string): Promise<void> {
-	const res = await fetch(`${API_BASE}/api/files/${id}`, {
+	await apiFetch(`${API_BASE}/api/files/${id}`, {
 		method: 'DELETE',
 		headers: { Authorization: `Bearer ${token}` }
 	});
-
-	if (!res.ok) {
-		let msg = `HTTP ${res.status}`;
-		try {
-			const err = await res.json();
-			msg = err.error || msg;
-		} catch {
-			msg += ' (invalid JSON)';
-		}
-		throw new Error(msg);
-	}
 }
 
 export async function updateFilePrivacy(
@@ -198,7 +158,7 @@ export async function updateFilePrivacy(
 	isPrivate: boolean,
 	token: string
 ): Promise<void> {
-	const res = await fetch(`${API_BASE}/api/files/${id}/privacy`, {
+	await apiFetch(`${API_BASE}/api/files/${id}/privacy`, {
 		method: 'POST',
 		headers: {
 			Authorization: `Bearer ${token}`,
@@ -206,45 +166,20 @@ export async function updateFilePrivacy(
 		},
 		body: JSON.stringify({ private: isPrivate })
 	});
-
-	if (!res.ok) {
-		let msg = `HTTP ${res.status}`;
-		try {
-			const err = await res.json();
-			msg = err.error || msg;
-		} catch {
-			msg += ' (invalid JSON)';
-		}
-		throw new Error(msg);
-	}
 }
 
 export async function searchFiles(query: string, token: string): Promise<SearchFileMeta[]> {
 	const url = new URL(`${API_BASE}/api/files/search`);
 	url.searchParams.set('q', query);
 
-	const res = await fetch(url.toString(), {
-		headers: { Authorization: `Bearer ${token}` }
-	});
+	const res = await apiFetch(
+		url.toString(),
+		{ headers: { Authorization: `Bearer ${token}` } },
+		[404, 204]
+	);
 
-	if (res.status === 401 || res.status === 403) {
-		throw new Error(`HTTP ${res.status}`);
-	}
-
-	// Treat empty or not-found as no result
 	if (res.status === 404 || res.status === 204) {
 		return [];
-	}
-
-	if (!res.ok) {
-		let msg = `HTTP ${res.status}`;
-		try {
-			const err = await res.json();
-			msg = err.error || msg;
-		} catch {
-			msg += ' (invalid JSON)';
-		}
-		throw new Error(msg);
 	}
 
 	// Safe parse check

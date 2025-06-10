@@ -12,12 +12,12 @@
 		fetchFiles,
 		searchFiles,
 		type FileMeta,
-		isImage,
-		fetchFileBlob,
 		openFile,
 		closePreview,
 		deleteFile
 	} from '$lib/api/files';
+	import { UnauthorizedError } from '$lib/api/http';
+	import { buildThumbnails } from '$lib/utils/thumbnails';
 
 	let token = '';
 	let files: FileMeta[] = [];
@@ -45,19 +45,9 @@
 			}
 			thumbnails = {};
 			files = newFiles;
-			for (const f of files) {
-				if (isImage(f.filename)) {
-					try {
-						const blob = await fetchFileBlob(f.id, token);
-						thumbnails[f.id] = URL.createObjectURL(blob);
-					} catch (e) {
-						console.error(e);
-					}
-				}
-			}
+			thumbnails = await buildThumbnails(files, token);
 		} catch (err: unknown) {
-			const message = (err as Error).message || '';
-			if (message.includes('401') || message.includes('403')) {
+			if (err instanceof UnauthorizedError) {
 				statusMessage = 'Session expired. Redirecting to login...';
 				clearToken();
 				setTimeout(() => goto('/login'), 1000);
@@ -85,15 +75,17 @@
 			}
 		} catch (err: unknown) {
 			console.error(err);
-			const message = (err as Error).message || '';
-			if (message.includes('401')) {
+			if (err instanceof UnauthorizedError) {
 				statusMessage = 'Session expired. Redirecting to login...';
 				clearToken();
 				setTimeout(() => goto('/login'), 1000);
-			} else if (message.includes('403')) {
-				showOwnerError = true;
-			} else if (message.includes('404')) {
-				statusNotFoundError = true;
+			} else {
+				const message = (err as Error).message || '';
+				if (message.includes('403')) {
+					showOwnerError = true;
+				} else if (message.includes('404')) {
+					statusNotFoundError = true;
+				}
 			}
 		}
 	}
@@ -119,19 +111,9 @@
 			}
 			thumbnails = {};
 			files = results;
-			for (const f of files) {
-				if (isImage(f.filename)) {
-					try {
-						const blob = await fetchFileBlob(f.id, token);
-						thumbnails[f.id] = URL.createObjectURL(blob);
-					} catch (e) {
-						console.error(e);
-					}
-				}
-			}
+			thumbnails = await buildThumbnails(files, token);
 		} catch (err: unknown) {
-			const message = (err as Error).message || '';
-			if (message.includes('401') || message.includes('403')) {
+			if (err instanceof UnauthorizedError) {
 				statusMessage = 'Session expired. Redirecting to login...';
 				clearToken();
 				setTimeout(() => goto('/login'), 1000);
@@ -311,11 +293,17 @@
 					fileToDelete = null;
 				} catch (err) {
 					console.error(err);
-					const message = (err as Error).message || '';
-					if (message.includes('403')) {
-						showOwnerError = true;
-					} else if (message.includes('404')) {
-						statusNotFoundError = true;
+					if (err instanceof UnauthorizedError) {
+						statusMessage = 'Session expired. Redirecting to login...';
+						clearToken();
+						setTimeout(() => goto('/login'), 1000);
+					} else {
+						const message = (err as Error).message || '';
+						if (message.includes('403')) {
+							showOwnerError = true;
+						} else if (message.includes('404')) {
+							statusNotFoundError = true;
+						}
 					}
 				} finally {
 					fileToDelete = null;

@@ -4,6 +4,7 @@
 	import { fetchUserProfile, type UserProfile } from '$lib/api/user';
 	import { logout, clearToken, getToken } from '$lib/api/auth';
 	import { LogOut, UserCircle } from 'lucide-svelte';
+	import Modal from './Modal.svelte';
 
 	export let token = '';
 	export let onClose: () => void;
@@ -21,10 +22,6 @@
 			loading = false;
 		}
 	});
-
-	function handleKey(event: KeyboardEvent) {
-		if (event.key === 'Escape') onClose();
-	}
 
 	async function handleLogout() {
 		const current = getToken();
@@ -44,23 +41,7 @@
 </script>
 
 <!-- Modal Overlay -->
-<div
-	tabindex="0"
-	role="dialog"
-	aria-modal="true"
-	aria-label="User profile"
-	on:keydown={handleKey}
-	class="fixed inset-0 z-50 flex items-center justify-end bg-black/60 backdrop-blur-sm"
->
-	<!-- Dismiss Layer -->
-	<button
-		type="button"
-		aria-label="Dismiss profile"
-		class="absolute inset-0 cursor-default"
-		on:click={onClose}
-	></button>
-
-	<!-- Side Panel -->
+<Modal {onClose} ariaLabel="User profile" overlayClass="items-center justify-end">
 	<div
 		class="animate-slide-in relative z-10 w-full max-w-sm bg-[#27282E] p-6 text-white shadow-xl sm:rounded-l-2xl"
 	>
@@ -102,7 +83,7 @@
 			</button>
 		</div>
 	</div>
-</div>
+</Modal>
 
 <style>
 	@keyframes slide-in {

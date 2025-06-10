@@ -1,26 +1,11 @@
 <script lang="ts">
+	import Modal from './Modal.svelte';
 	export let message: string;
 	export let onClose: () => void;
-
-	function handleKey(event: KeyboardEvent) {
-		if (event.key === 'Escape') onClose();
-	}
 </script>
 
 <!-- Overlay -->
-<div
-	tabindex="0"
-	role="dialog"
-	aria-modal="true"
-	aria-label="Alert dialog"
-	on:keydown={handleKey}
-	class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
->
-	<!-- Dismiss background -->
-	<button type="button" aria-label="Dismiss alert" class="absolute inset-0" on:click={onClose}
-	></button>
-
-	<!-- Modal box -->
+<Modal {onClose} ariaLabel="Alert dialog">
 	<div
 		role="document"
 		class="animate-fade-in relative z-10 w-full max-w-md rounded-2xl bg-[#27282E] px-6 py-7 text-white shadow-2xl transition-all duration-300"
@@ -56,7 +41,7 @@
 			</button>
 		</div>
 	</div>
-</div>
+</Modal>
 
 <style>
 	@keyframes fade-in {

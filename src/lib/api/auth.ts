@@ -1,4 +1,5 @@
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+import { API_BASE } from './config';
+import { apiFetch } from './http';
 
 interface LoginResponse {
 	token?: string;
@@ -7,24 +8,13 @@ interface LoginResponse {
 
 // Login function returns a token
 export async function login(username: string, password: string): Promise<string> {
-	const res = await fetch(`${API_BASE}/api/login`, {
+	const res = await apiFetch(`${API_BASE}/api/login`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({ username, password })
 	});
-
-	if (!res.ok) {
-		let msg = `HTTP ${res.status}`;
-		try {
-			const err = await res.json();
-			msg = err.error || msg;
-		} catch {
-			msg += ' (invalid JSON)';
-		}
-		throw new Error(msg);
-	}
 
 	let data: LoginResponse;
 	try {
@@ -52,21 +42,10 @@ export function clearToken(): void {
 
 // Call backend to invalidate session token
 export async function logout(token: string): Promise<void> {
-	const res = await fetch(`${API_BASE}/api/logout`, {
+	await apiFetch(`${API_BASE}/api/logout`, {
 		method: 'POST',
 		headers: {
 			Authorization: `Bearer ${token}`
 		}
 	});
-
-	if (!res.ok) {
-		let msg = `HTTP ${res.status}`;
-		try {
-			const err = await res.json();
-			msg = err.error || msg;
-		} catch {
-			msg += ' (invalid JSON)';
-		}
-		throw new Error(msg);
-	}
 }

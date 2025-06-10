@@ -1,27 +1,11 @@
 <script lang="ts">
+	import Modal from './Modal.svelte';
 	export let message: string;
 	export let onConfirm: () => void;
 	export let onCancel: () => void;
-
-	function handleKey(event: KeyboardEvent) {
-		if (event.key === 'Escape') onCancel();
-	}
 </script>
 
-<div
-	tabindex="0"
-	role="dialog"
-	aria-modal="true"
-	aria-label="Confirmation dialog"
-	on:keydown={handleKey}
-	class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
->
-	<button
-		type="button"
-		aria-label="Dismiss confirmation"
-		class="absolute inset-0"
-		on:click={onCancel}
-	></button>
+<Modal onClose={onCancel} ariaLabel="Confirmation dialog">
 	<div
 		role="document"
 		class="relative z-10 w-full max-w-md rounded-2xl bg-[#27282E] p-6 text-white shadow-2xl transition-all duration-300"
@@ -44,4 +28,4 @@
 			</button>
 		</div>
 	</div>
-</div>
+</Modal>

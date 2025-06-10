@@ -71,29 +71,10 @@
 		files = files.filter((_, i) => i !== index);
 	}
 
-	function handleKey(event: KeyboardEvent) {
-		if (event.key === 'Escape') onClose();
-	}
+	import Modal from './Modal.svelte';
 </script>
 
-<!-- Modal Overlay -->
-<div
-	tabindex="0"
-	role="dialog"
-	aria-modal="true"
-	aria-label="Upload files modal"
-	on:keydown={handleKey}
-	class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
->
-	<!-- Dismiss Background -->
-	<button
-		type="button"
-		aria-label="Dismiss upload modal"
-		class="absolute inset-0"
-		on:click={onClose}
-	></button>
-
-	<!-- Modal Card -->
+<Modal {onClose} ariaLabel="Upload files modal">
 	<div
 		role="document"
 		class="relative z-10 w-full max-w-md rounded-2xl bg-[#27282E] p-6 text-white shadow-2xl transition-all duration-300"
@@ -212,4 +193,4 @@
 			<p class="mt-4 text-center text-sm text-gray-400">{uploadStatus}</p>
 		{/if}
 	</div>
-</div>
+</Modal>
