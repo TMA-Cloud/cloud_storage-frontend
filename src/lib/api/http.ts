@@ -14,7 +14,7 @@ export async function apiFetch(
 		return res;
 	}
 
-	if (res.status === 401 || res.status === 403) {
+	if (res.status === 401) {
 		throw new UnauthorizedError(`HTTP ${res.status}`);
 	}
 
