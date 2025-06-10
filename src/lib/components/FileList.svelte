@@ -73,6 +73,8 @@
 	let box = { left: 0, top: 0, width: 0, height: 0 };
 	let startX = 0;
 	let startY = 0;
+	let scrollX = 0;
+	let scrollY = 0;
 
 	function toggleMenu(id: string) {
 		openMenu = openMenu === id ? null : id;
@@ -129,16 +131,20 @@
 		if (event.ctrlKey || event.metaKey) return;
 		openMenu = null;
 		selecting = true;
-		startX = event.clientX;
-		startY = event.clientY;
+		startX = event.pageX;
+		startY = event.pageY;
+		scrollX = window.scrollX;
+		scrollY = window.scrollY;
 		box = { left: startX, top: startY, width: 0, height: 0 };
 		clearSelection();
 	}
 
 	function onMouseMove(event: MouseEvent) {
 		if (!selecting) return;
-		const currentX = event.clientX;
-		const currentY = event.clientY;
+		const currentX = event.pageX;
+		const currentY = event.pageY;
+		scrollX = window.scrollX;
+		scrollY = window.scrollY;
 		box = {
 			left: Math.min(startX, currentX),
 			top: Math.min(startY, currentY),
@@ -150,11 +156,15 @@
 			const el = rowRefs[file.id];
 			if (!el) continue;
 			const rect = el.getBoundingClientRect();
+			const rectLeft = rect.left + window.scrollX;
+			const rectRight = rect.right + window.scrollX;
+			const rectTop = rect.top + window.scrollY;
+			const rectBottom = rect.bottom + window.scrollY;
 			if (
-				box.left < rect.right &&
-				box.left + box.width > rect.left &&
-				box.top < rect.bottom &&
-				box.top + box.height > rect.top
+				box.left < rectRight &&
+				box.left + box.width > rectLeft &&
+				box.top < rectBottom &&
+				box.top + box.height > rectTop
 			) {
 				next.add(file.id);
 			}
@@ -202,7 +212,17 @@
 	}
 </script>
 
-<svelte:window on:click={handleWindowClick} on:mousemove={onMouseMove} on:mouseup={onMouseUp} />
+<svelte:window
+	on:click={handleWindowClick}
+	on:mousemove={onMouseMove}
+	on:mouseup={onMouseUp}
+	on:scroll={() => {
+		if (selecting) {
+			scrollX = window.scrollX;
+			scrollY = window.scrollY;
+		}
+	}}
+/>
 
 <div
 	class="relative"
@@ -217,7 +237,8 @@
 	{#if selecting}
 		<div
 			class="pointer-events-none fixed z-20 border-2 border-blue-500 bg-blue-500/20"
-			style="left: {box.left}px; top: {box.top}px; width: {box.width}px; height: {box.height}px;"
+			style="left: {box.left - scrollX}px; top: {box.top -
+				scrollY}px; width: {box.width}px; height: {box.height}px;"
 		></div>
 	{/if}
 	<table class="min-w-full divide-y divide-gray-700">
