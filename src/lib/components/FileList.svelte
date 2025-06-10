@@ -283,7 +283,10 @@
 								{@const Icon = getIconComponent(file.filename.split('.').pop() || '')}
 								<Icon class="h-12 w-12 rounded border bg-gray-700 p-2 text-white" />
 							{/if}
-							<span class="flex items-center gap-1 font-semibold hover:underline">
+							<span
+								class="flex max-w-xs items-center gap-1 truncate font-semibold hover:underline"
+								title={file.filename}
+							>
 								{file.filename}
 								{#if file.is_private}
 									<Lock class="h-4 w-4 text-gray-400" />

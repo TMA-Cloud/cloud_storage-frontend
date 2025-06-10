@@ -10,7 +10,7 @@
 		role="document"
 		class="relative z-10 w-full max-w-md rounded-2xl bg-[#27282E] p-6 text-white shadow-2xl transition-all duration-300"
 	>
-		<p class="mb-6 text-center text-lg">{message}</p>
+		<p class="mb-6 text-center text-lg break-all" title={message}>{message}</p>
 		<div class="flex justify-end gap-2">
 			<button
 				type="button"

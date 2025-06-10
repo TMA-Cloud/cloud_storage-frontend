@@ -10,6 +10,7 @@
 	let files: File[] = [];
 	let token = '';
 	let uploadStatus = '';
+	let uploadedNames = '';
 	let dropActive = false;
 	let uploading = false;
 	let privateUpload = false;
@@ -26,16 +27,20 @@
 	async function handleUpload() {
 		if (uploading || files.length === 0 || !token) {
 			uploadStatus = 'Missing files or token';
+			uploadedNames = '';
 			return;
 		}
 
+		uploadStatus = '';
+		uploadedNames = '';
 		uploading = true;
 
 		try {
 			const data = await uploadFiles(files, token, privateUpload);
 			const count = data.files.length;
 			const names = data.files.map((f) => f.filename).join(', ');
-			uploadStatus = `✅ Uploaded ${count} file${count === 1 ? '' : 's'}: ${names}`;
+			uploadStatus = `✅ Uploaded ${count} file${count === 1 ? '' : 's'}: `;
+			uploadedNames = names;
 			onUploaded();
 			setTimeout(() => {
 				uploading = false;
@@ -45,6 +50,7 @@
 			console.error(err);
 			const message = (err as Error).message || '';
 			uploadStatus = `❌ Upload failed: ${message || 'Unknown error'}`;
+			uploadedNames = '';
 			uploading = false;
 		}
 	}
@@ -124,7 +130,7 @@
 				<ul class="mt-1 space-y-1 text-sm font-medium text-gray-200">
 					{#each files as f, i (i)}
 						<li class="flex items-center gap-2">
-							<span>📄 {f.name}</span>
+							<span class="max-w-xs truncate" title={f.name}>📄 {f.name}</span>
 							<button
 								type="button"
 								on:click={() => removeFile(i)}
@@ -190,7 +196,14 @@
 
 		<!-- Upload Status -->
 		{#if uploadStatus}
-			<p class="mt-4 text-center text-sm text-gray-400">{uploadStatus}</p>
+			<p class="mt-4 text-center text-sm text-gray-400">
+				{uploadStatus}
+				{#if uploadedNames}
+					<span class="mx-1 inline-block max-w-xs truncate align-bottom" title={uploadedNames}
+						>{uploadedNames}</span
+					>
+				{/if}
+			</p>
 		{/if}
 	</div>
 </Modal>
