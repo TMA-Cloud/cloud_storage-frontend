@@ -16,7 +16,8 @@
 		openFile,
 		closePreview,
 		deleteFile,
-		deleteFiles
+		deleteFiles,
+		fetchSupportedTypes
 	} from '$lib/api/files';
 	import { UnauthorizedError } from '$lib/api/http';
 	import { buildThumbnails } from '$lib/utils/thumbnails';
@@ -39,6 +40,8 @@
 	let searching = false;
 	let showOwnerError = false;
 	let statusNotFoundError = false;
+	let showUnsupportedError = false;
+	let supportedExts: Set<string> = new Set();
 	let headerHeight = 0;
 
 	async function loadFiles(page: number = currentPage) {
@@ -67,10 +70,21 @@
 		const raw = getToken();
 		if (!raw) return;
 		token = raw;
+		try {
+			const types = await fetchSupportedTypes();
+			supportedExts = new Set(Object.keys(types));
+		} catch (err) {
+			console.error(err);
+		}
 		await loadFiles();
 	});
 
 	async function handleOpen(file: FileMeta) {
+		const ext = '.' + (file.filename.split('.').pop()?.toLowerCase() || '');
+		if (supportedExts.size && !supportedExts.has(ext)) {
+			showUnsupportedError = true;
+			return;
+		}
 		try {
 			if (previewImage) {
 				closePreview(previewImage);
@@ -378,6 +392,13 @@
 		<AlertModal
 			message="The requested file was not found."
 			onClose={() => (statusNotFoundError = false)}
+		/>
+	{/if}
+
+	{#if showUnsupportedError}
+		<AlertModal
+			message="This file type cannot be opened."
+			onClose={() => (showUnsupportedError = false)}
 		/>
 	{/if}
 </main>
