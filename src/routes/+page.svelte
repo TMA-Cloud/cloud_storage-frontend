@@ -20,6 +20,7 @@
 	} from '$lib/api/files';
 	import { UnauthorizedError, HttpError } from '$lib/api/http';
 	import { buildThumbnails } from '$lib/utils/thumbnails';
+	import { connectEvents, type BackendEvent } from '$lib/api/events';
 
 	let token = '';
 	let files: FileMeta[] = [];
@@ -27,6 +28,7 @@
 	let hasNextPage = false;
 	let previewImage: string | null = null;
 	let thumbnails: Record<string, string> = {};
+	let socket: WebSocket | null = null;
 	let statusMessage = '';
 	let showUploadModal = false;
 	let showProfileModal = false;
@@ -78,7 +80,40 @@
 			console.error(err);
 		}
 		await loadFiles();
+		socket = connectEvents(handleEvent);
 	});
+
+	function handleEvent(evt: BackendEvent) {
+		if (!evt.file_id) return;
+		if (evt.type === 'delete') {
+			files = files.filter((f) => f.id !== evt.file_id);
+			if (thumbnails[evt.file_id]) {
+				URL.revokeObjectURL(thumbnails[evt.file_id]);
+				delete thumbnails[evt.file_id];
+			}
+			return;
+		}
+		if (evt.type === 'privacy') {
+			const val = (evt.data as Record<string, unknown>)?.private as boolean | undefined;
+			if (typeof val === 'boolean') {
+				files = files.map((f) => (f.id === evt.file_id ? { ...f, is_private: val } : f));
+			}
+			return;
+		}
+		if (evt.type === 'protect') {
+			const val = (evt.data as Record<string, unknown>)?.protected as boolean | undefined;
+			if (typeof val === 'boolean') {
+				files = files.map((f) => (f.id === evt.file_id ? { ...f, delete_protected: val } : f));
+			}
+			return;
+		}
+		if (evt.type === 'readonly') {
+			const val = (evt.data as Record<string, unknown>)?.readonly as boolean | undefined;
+			if (typeof val === 'boolean') {
+				files = files.map((f) => (f.id === evt.file_id ? { ...f, read_only: val } : f));
+			}
+		}
+	}
 
 	async function handleOpen(file: FileMeta) {
 		const ext = '.' + (file.filename.split('.').pop()?.toLowerCase() || '');
@@ -174,6 +209,10 @@
 		}
 		for (const url of Object.values(thumbnails)) {
 			URL.revokeObjectURL(url);
+		}
+		if (socket) {
+			socket.close();
+			socket = null;
 		}
 	});
 </script>
