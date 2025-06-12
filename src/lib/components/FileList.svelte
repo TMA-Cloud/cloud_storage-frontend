@@ -1,10 +1,16 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import { isImage, type FileMeta, downloadFile, updateFilePrivacy } from '$lib/api/files';
+	import {
+		isImage,
+		type FileMeta,
+		downloadFile,
+		updateFilePrivacy,
+		updateFileProtection
+	} from '$lib/api/files';
 	import { formatFileSize } from '$lib/utils/format';
 	import { getIconComponent } from '$lib/utils/fileIcons';
 	import ThumbnailPlaceholder from './ThumbnailPlaceholder.svelte';
-	import { Download, Trash2, Lock, Unlock, MoreVertical } from 'lucide-svelte';
+	import { Download, Trash2, Lock, Unlock, MoreVertical, Shield, ShieldOff } from 'lucide-svelte';
 	import AlertModal from './AlertModal.svelte';
 	import Toast from './Toast.svelte';
 
@@ -112,6 +118,26 @@
 			await updateFilePrivacy(file.id, !file.is_private, token);
 			files = files.map((f) => (f.id === file.id ? { ...f, is_private: !file.is_private } : f));
 			showToast(!file.is_private ? 'File is now private' : 'File is now public');
+		} catch (err) {
+			console.error(err);
+			const message = (err as Error).message || '';
+			if (message.includes('403')) {
+				showOwnerError = true;
+			} else if (message.includes('404')) {
+				statusNotFoundError = true;
+			}
+		}
+	}
+
+	async function toggleProtection(file: FileMeta) {
+		try {
+			await updateFileProtection(file.id, !file.delete_protected, token);
+			files = files.map((f) =>
+				f.id === file.id ? { ...f, delete_protected: !file.delete_protected } : f
+			);
+			showToast(
+				!file.delete_protected ? 'Delete protection enabled' : 'Delete protection disabled'
+			);
 		} catch (err) {
 			console.error(err);
 			const message = (err as Error).message || '';
@@ -291,6 +317,9 @@
 								{#if file.is_private}
 									<Lock class="h-4 w-4 text-gray-400" />
 								{/if}
+								{#if file.delete_protected}
+									<Shield class="h-4 w-4 text-gray-400" />
+								{/if}
 							</span>
 						</div>
 					</td>
@@ -342,6 +371,25 @@
 									{:else}
 										<Lock class="h-4 w-4" />
 										<span>Make Private</span>
+									{/if}
+								</button>
+								<button
+									type="button"
+									on:click|stopPropagation={() => {
+										toggleProtection(file);
+										openMenu = null;
+									}}
+									class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-200 hover:bg-gray-600"
+									aria-label={file.delete_protected
+										? `Disable delete protection for ${file.filename}`
+										: `Protect ${file.filename} from deletion`}
+								>
+									{#if file.delete_protected}
+										<ShieldOff class="h-4 w-4" />
+										<span>Disable Protection</span>
+									{:else}
+										<Shield class="h-4 w-4" />
+										<span>Protect Delete</span>
 									{/if}
 								</button>
 								<button

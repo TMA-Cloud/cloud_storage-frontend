@@ -11,6 +11,7 @@ export interface FileMeta {
 	modified_by: string;
 	modified_at: string;
 	is_private: boolean;
+	delete_protected: boolean;
 }
 
 export interface SearchFileMeta extends FileMeta {
@@ -26,6 +27,7 @@ export interface UploadedFile {
 	modified_by: string;
 	modified_at: string;
 	is_private: boolean;
+	delete_protected: boolean;
 }
 
 // Upload response containing metadata about all files
@@ -206,6 +208,21 @@ export async function updateFilePrivacy(
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({ private: isPrivate })
+	});
+}
+
+export async function updateFileProtection(
+	id: string,
+	isProtected: boolean,
+	token: string
+): Promise<void> {
+	await apiFetch(`${API_BASE}/api/files/${id}/protect`, {
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${token}`,
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ protected: isProtected })
 	});
 }
 
