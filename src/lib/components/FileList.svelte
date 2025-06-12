@@ -5,12 +5,23 @@
 		type FileMeta,
 		downloadFile,
 		updateFilePrivacy,
-		updateFileProtection
+		updateFileProtection,
+		updateFileReadOnly
 	} from '$lib/api/files';
 	import { formatFileSize } from '$lib/utils/format';
 	import { getIconComponent } from '$lib/utils/fileIcons';
 	import ThumbnailPlaceholder from './ThumbnailPlaceholder.svelte';
-	import { Download, Trash2, Lock, Unlock, MoreVertical, Shield, ShieldOff } from 'lucide-svelte';
+	import {
+		Download,
+		Trash2,
+		Lock,
+		Unlock,
+		MoreVertical,
+		Shield,
+		ShieldOff,
+		PencilOff,
+		PencilLine
+	} from 'lucide-svelte';
 	import AlertModal from './AlertModal.svelte';
 	import Toast from './Toast.svelte';
 
@@ -138,6 +149,22 @@
 			showToast(
 				!file.delete_protected ? 'Delete protection enabled' : 'Delete protection disabled'
 			);
+		} catch (err) {
+			console.error(err);
+			const message = (err as Error).message || '';
+			if (message.includes('403')) {
+				showOwnerError = true;
+			} else if (message.includes('404')) {
+				statusNotFoundError = true;
+			}
+		}
+	}
+
+	async function toggleReadOnly(file: FileMeta) {
+		try {
+			await updateFileReadOnly(file.id, !file.read_only, token);
+			files = files.map((f) => (f.id === file.id ? { ...f, read_only: !file.read_only } : f));
+			showToast(!file.read_only ? 'Read-only enabled' : 'Read-only disabled');
 		} catch (err) {
 			console.error(err);
 			const message = (err as Error).message || '';
@@ -320,6 +347,9 @@
 								{#if file.delete_protected}
 									<Shield class="h-4 w-4 text-gray-400" />
 								{/if}
+								{#if file.read_only}
+									<PencilOff class="h-4 w-4 text-gray-400" />
+								{/if}
 							</span>
 						</div>
 					</td>
@@ -390,6 +420,25 @@
 									{:else}
 										<Shield class="h-4 w-4" />
 										<span>Protect Delete</span>
+									{/if}
+								</button>
+								<button
+									type="button"
+									on:click|stopPropagation={() => {
+										toggleReadOnly(file);
+										openMenu = null;
+									}}
+									class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-200 hover:bg-gray-600"
+									aria-label={file.read_only
+										? `Allow editing of ${file.filename}`
+										: `Make ${file.filename} read-only`}
+								>
+									{#if file.read_only}
+										<PencilLine class="h-4 w-4" />
+										<span>Allow Edit</span>
+									{:else}
+										<PencilOff class="h-4 w-4" />
+										<span>Read Only</span>
 									{/if}
 								</button>
 								<button

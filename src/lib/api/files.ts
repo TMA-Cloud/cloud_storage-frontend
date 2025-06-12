@@ -11,6 +11,7 @@ export interface FileMeta {
 	modified_by: string;
 	modified_at: string;
 	is_private: boolean;
+	read_only: boolean;
 	delete_protected: boolean;
 }
 
@@ -27,6 +28,7 @@ export interface UploadedFile {
 	modified_by: string;
 	modified_at: string;
 	is_private: boolean;
+	read_only: boolean;
 	delete_protected: boolean;
 }
 
@@ -223,6 +225,21 @@ export async function updateFileProtection(
 			'Content-Type': 'application/json'
 		},
 		body: JSON.stringify({ protected: isProtected })
+	});
+}
+
+export async function updateFileReadOnly(
+	id: string,
+	readOnly: boolean,
+	token: string
+): Promise<void> {
+	await apiFetch(`${API_BASE}/api/files/${id}/readonly`, {
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${token}`,
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ readonly: readOnly })
 	});
 }
 
