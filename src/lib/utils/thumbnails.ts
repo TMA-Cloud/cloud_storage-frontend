@@ -12,14 +12,15 @@ async function delay(ms: number) {
  * few times for any missing thumbnails before giving up.
  */
 export async function buildThumbnails(
-	files: FileMeta[],
+	files: FileMeta[] | null | undefined,
 	retries = 3,
 	retryDelay = 1000
 ): Promise<Record<string, string>> {
+	const fileList = Array.isArray(files) ? files : [];
 	const map: Record<string, string> = {};
 	const missing: FileMeta[] = [];
 
-	for (const f of files) {
+	for (const f of fileList) {
 		if (!isImage(f.filename)) continue;
 		try {
 			const blob = await fetchThumbnailBlob(f.id);

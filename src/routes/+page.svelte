@@ -53,7 +53,7 @@
 				URL.revokeObjectURL(url);
 			}
 			thumbnails = {};
-			files = newFiles;
+			files = Array.isArray(newFiles) ? newFiles : [];
 			thumbnails = await buildThumbnails(files);
 		} catch (err: unknown) {
 			if (err instanceof UnauthorizedError) {
@@ -130,7 +130,7 @@
 				URL.revokeObjectURL(url);
 			}
 			thumbnails = {};
-			files = results;
+			files = Array.isArray(results) ? results : [];
 			thumbnails = await buildThumbnails(files);
 		} catch (err: unknown) {
 			if (err instanceof UnauthorizedError) {
@@ -270,7 +270,7 @@
 	{/if}
 
 	<!-- File List -->
-	{#if files.length === 0}
+	{#if !files || files.length === 0}
 		<div class="mt-20 text-center text-gray-500">
 			<p class="text-xl font-semibold">{searchActive ? 'No matching files' : 'No files yet'}</p>
 			<p class="mt-1 text-sm text-gray-400">
