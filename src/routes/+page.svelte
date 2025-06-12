@@ -40,6 +40,7 @@
 	let searching = false;
 	let showOwnerError = false;
 	let statusNotFoundError = false;
+	let showProtectedError = false;
 	let showUnsupportedError = false;
 	let supportedExts: Set<string> = new Set();
 	let headerHeight = 0;
@@ -336,7 +337,9 @@
 						setTimeout(() => goto('/login'), 1000);
 					} else {
 						const message = (err as Error).message || '';
-						if (message.includes('403')) {
+						if (message.includes('delete protected')) {
+							showProtectedError = true;
+						} else if (message.includes('403')) {
 							showOwnerError = true;
 						} else if (message.includes('404')) {
 							statusNotFoundError = true;
@@ -364,6 +367,15 @@
 						statusMessage = 'Session expired. Redirecting to login...';
 						clearToken();
 						setTimeout(() => goto('/login'), 1000);
+					} else {
+						const message = (err as Error).message || '';
+						if (message.includes('delete protected')) {
+							showProtectedError = true;
+						} else if (message.includes('403')) {
+							showOwnerError = true;
+						} else if (message.includes('404')) {
+							statusNotFoundError = true;
+						}
 					}
 				} finally {
 					confirmBulk = false;
@@ -392,6 +404,13 @@
 		<AlertModal
 			message="The requested file was not found."
 			onClose={() => (statusNotFoundError = false)}
+		/>
+	{/if}
+
+	{#if showProtectedError}
+		<AlertModal
+			message="This file is delete-protected."
+			onClose={() => (showProtectedError = false)}
 		/>
 	{/if}
 
