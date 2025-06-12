@@ -1,5 +1,5 @@
 import { API_BASE, SUPPORTED_TYPES_VERSION } from './config';
-import { apiFetch } from './http';
+import { apiFetch, HttpError, UnauthorizedError } from './http';
 
 // File metadata interface
 export interface FileMeta {
@@ -196,6 +196,35 @@ export async function deleteFiles(ids: string[], token: string): Promise<string[
 	} catch {
 		return [];
 	}
+}
+
+export interface DeleteBatchResult {
+	deleted: string[];
+	errors: { id: string; status: number; message: string }[];
+}
+
+export async function deleteFilesIndividually(
+	ids: string[],
+	token: string
+): Promise<DeleteBatchResult> {
+	const result: DeleteBatchResult = { deleted: [], errors: [] };
+	for (const id of ids) {
+		try {
+			await deleteFile(id, token);
+			result.deleted.push(id);
+		} catch (err) {
+			if (err instanceof UnauthorizedError) {
+				throw err;
+			}
+			if (err instanceof HttpError) {
+				result.errors.push({ id, status: err.status, message: err.message });
+			} else {
+				const msg = err instanceof Error ? err.message : 'unknown error';
+				result.errors.push({ id, status: 0, message: msg });
+			}
+		}
+	}
+	return result;
 }
 
 export async function updateFilePrivacy(
