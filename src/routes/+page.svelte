@@ -193,7 +193,10 @@
 
 	<!-- Modals -->
 	{#if $showUploadModal}
-		<UploadModal onClose={() => ($showUploadModal = false)} onUploaded={loadFiles} />
+		<UploadModal
+			onClose={() => ($showUploadModal = false)}
+			onUploaded={() => loadFiles(undefined, false)}
+		/>
 	{/if}
 
 	{#if $previewImage}

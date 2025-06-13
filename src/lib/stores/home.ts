@@ -7,7 +7,8 @@ import {
 	type FileMeta,
 	openFile,
 	closePreview,
-	fetchSupportedTypes
+	fetchSupportedTypes,
+	fetchThumbnailBlob
 } from '$lib/api/files';
 import { UnauthorizedError } from '$lib/api/http';
 import { buildThumbnails } from '$lib/utils/thumbnails';
@@ -41,7 +42,7 @@ export const versionMessages = writable<string[]>([]);
 
 let socket: WebSocket | null = null;
 
-export async function loadFiles(page: number = get(currentPage)) {
+export async function loadFiles(page: number = get(currentPage), fetchThumbs = true) {
 	try {
 		const { files: newFiles, has_next } = await fetchFiles(get(token), page);
 		currentPage.set(page);
@@ -51,7 +52,10 @@ export async function loadFiles(page: number = get(currentPage)) {
 		}
 		thumbnails.set({});
 		files.set(Array.isArray(newFiles) ? newFiles : []);
-		thumbnails.set(await buildThumbnails(get(files)));
+		// fetch thumbnails that already exist; new ones will arrive via websocket events
+		if (fetchThumbs) {
+			thumbnails.set(await buildThumbnails(get(files), 0));
+		}
 	} catch (err: unknown) {
 		if (err instanceof UnauthorizedError) {
 			statusMessage.set('Session expired. Redirecting to login...');
@@ -117,6 +121,7 @@ export function destroyHome() {
 
 export function handleEvent(evt: BackendEvent) {
 	if (!evt.file_id) return;
+	const id = evt.file_id;
 	if (evt.type === 'delete') {
 		files.update((fs) => fs.filter((f) => f.id !== evt.file_id));
 		const th = get(thumbnails);
@@ -125,6 +130,23 @@ export function handleEvent(evt: BackendEvent) {
 			delete th[evt.file_id];
 			thumbnails.set({ ...th });
 		}
+		return;
+	}
+	if (evt.type === 'thumbnail_ready') {
+		(async () => {
+			try {
+				const blob = await fetchThumbnailBlob(id);
+				if (!blob) return;
+				thumbnails.update((th) => {
+					if (th[id]) {
+						URL.revokeObjectURL(th[id]);
+					}
+					return { ...th, [id]: URL.createObjectURL(blob) };
+				});
+			} catch (err) {
+				console.error(err);
+			}
+		})();
 		return;
 	}
 	if (evt.type === 'privacy') {
@@ -206,7 +228,7 @@ export async function performSearch() {
 		}
 		thumbnails.set({});
 		files.set(Array.isArray(results) ? results : []);
-		thumbnails.set(await buildThumbnails(get(files)));
+		thumbnails.set(await buildThumbnails(get(files), 0));
 	} catch (err: unknown) {
 		if (err instanceof UnauthorizedError) {
 			statusMessage.set('Session expired. Redirecting to login...');
