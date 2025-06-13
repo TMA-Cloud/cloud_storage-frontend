@@ -22,6 +22,10 @@ export const hasNextPage = writable(false);
 export const previewImage = writable<string | null>(null);
 export const thumbnails = writable<Record<string, string>>({});
 export const statusMessage = writable('');
+
+export function clearStatusMessage() {
+	statusMessage.set('');
+}
 export const showUploadModal = writable(false);
 export const showProfileModal = writable(false);
 export const fileToDelete = writable<FileMeta | null>(null);
@@ -220,7 +224,7 @@ export async function performSearch() {
 	try {
 		const results = await searchFiles(get(searchQuery), get(token));
 		searchActive.set(true);
-		statusMessage.set('');
+		clearStatusMessage();
 		hasNextPage.set(false);
 		currentPage.set(1);
 		for (const url of Object.values(get(thumbnails))) {
@@ -254,7 +258,7 @@ export async function performSearch() {
 export async function clearSearch() {
 	searchQuery.set('');
 	searchActive.set(false);
-	statusMessage.set('');
+	clearStatusMessage();
 	await loadFiles(1);
 }
 

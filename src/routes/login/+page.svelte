@@ -1,15 +1,20 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { onMount } from 'svelte';
 	import { login } from '$lib/api/auth';
+	import { clearStatusMessage } from '$lib/stores/home';
 
 	let username = '';
 	let password = '';
 	let error = '';
 
+	onMount(clearStatusMessage);
+
 	async function handleLogin() {
 		error = '';
 		try {
 			await login(username, password);
+			clearStatusMessage();
 			goto('/');
 		} catch (err: unknown) {
 			const message = (err as Error).message || '';
