@@ -24,12 +24,12 @@
 		searchQuery,
 		searchActive,
 		searching,
+		versionMessages,
 		showOwnerError,
 		statusNotFoundError,
 		showProtectedError,
 		showUnsupportedError,
 		bulkResultMessage,
-		supportedExts,
 		headerHeight,
 		loadFiles,
 		initHome,
@@ -52,7 +52,7 @@
 <main class="min-h-screen bg-[#1E1F23] px-6 py-6 font-sans text-[#F3F4F6] select-none">
 	<!-- Top Header -->
 	<div
-		class="sticky top-0 z-10 mb-10 flex items-center justify-between border-b border-[#2E2F35] bg-[#1E1F23] py-3"
+		class="relative sticky top-0 z-10 mb-10 flex items-center justify-between border-b border-[#2E2F35] bg-[#1E1F23] py-3"
 		bind:clientHeight={$headerHeight}
 	>
 		<h1 class="flex items-center gap-3 text-3xl font-bold tracking-tight text-amber-300">
@@ -126,6 +126,15 @@
 				</button>
 			{/if}
 		</div>
+		{#if $versionMessages.length > 0}
+			<div
+				class="absolute top-1/2 left-1/2 z-20 -translate-x-1/2 -translate-y-1/2 rounded bg-yellow-700 px-4 py-2 text-sm text-yellow-100 shadow"
+			>
+				{#each $versionMessages as msg (msg)}
+					<div>{msg}</div>
+				{/each}
+			</div>
+		{/if}
 	</div>
 
 	<!-- Error or Status -->

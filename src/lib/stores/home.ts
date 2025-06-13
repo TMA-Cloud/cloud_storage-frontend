@@ -7,12 +7,12 @@ import {
 	type FileMeta,
 	openFile,
 	closePreview,
-	deleteFile,
 	fetchSupportedTypes
 } from '$lib/api/files';
-import { UnauthorizedError, HttpError } from '$lib/api/http';
+import { UnauthorizedError } from '$lib/api/http';
 import { buildThumbnails } from '$lib/utils/thumbnails';
 import { connectEvents, type BackendEvent } from '$lib/api/events';
+import { checkFrontendVersion, fetchBackendVersion } from '$lib/api/version';
 
 export const token = writable('');
 export const files = writable<FileMeta[]>([]);
@@ -37,6 +37,7 @@ export const showUnsupportedError = writable(false);
 export const bulkResultMessage = writable('');
 export const supportedExts = writable<Set<string>>(new Set());
 export const headerHeight = writable(0);
+export const versionMessages = writable<string[]>([]);
 
 let socket: WebSocket | null = null;
 
@@ -62,6 +63,29 @@ export async function loadFiles(page: number = get(currentPage)) {
 	}
 }
 
+export async function checkVersions() {
+	const msgs: string[] = [];
+	try {
+		const f = await checkFrontendVersion();
+		if (f.outdated) {
+			msgs.push(`A new frontend version ${f.latest} is available. You are running ${f.current}.`);
+		}
+	} catch (err) {
+		console.error(err);
+	}
+	try {
+		const b = await fetchBackendVersion();
+		if (b.outdated) {
+			msgs.push(
+				`A new backend version ${b.latest} is available. Your server is running ${b.current}.`
+			);
+		}
+	} catch (err) {
+		console.error(err);
+	}
+	versionMessages.set(msgs);
+}
+
 export async function initHome() {
 	const raw = getToken();
 	if (!raw) return;
@@ -74,6 +98,7 @@ export async function initHome() {
 	}
 	await loadFiles();
 	socket = connectEvents(handleEvent);
+	void checkVersions();
 }
 
 export function destroyHome() {
