@@ -24,6 +24,10 @@
 	} from 'lucide-svelte';
 	import AlertModal from './AlertModal.svelte';
 	import Toast from './Toast.svelte';
+	import { goto } from '$app/navigation';
+	import { clearToken } from '$lib/api/auth';
+	import { UnauthorizedError } from '$lib/api/http';
+	import { statusMessage } from '$lib/stores/home';
 
 	export let files: FileMeta[] = [];
 	export let thumbnails: Record<string, string> = {};
@@ -64,6 +68,12 @@
 			await downloadFile(file, token);
 		} catch (err) {
 			console.error(err);
+			if (err instanceof UnauthorizedError) {
+				statusMessage.set('Session expired. Redirecting to login...');
+				clearToken();
+				setTimeout(() => goto('/login'), 1000);
+				return;
+			}
 			const message = (err as Error).message || '';
 			if (message.includes('403')) {
 				showOwnerError = true;
@@ -131,6 +141,12 @@
 			showToast(!file.is_private ? 'File is now private' : 'File is now public');
 		} catch (err) {
 			console.error(err);
+			if (err instanceof UnauthorizedError) {
+				statusMessage.set('Session expired. Redirecting to login...');
+				clearToken();
+				setTimeout(() => goto('/login'), 1000);
+				return;
+			}
 			const message = (err as Error).message || '';
 			if (message.includes('403')) {
 				showOwnerError = true;
@@ -151,6 +167,12 @@
 			);
 		} catch (err) {
 			console.error(err);
+			if (err instanceof UnauthorizedError) {
+				statusMessage.set('Session expired. Redirecting to login...');
+				clearToken();
+				setTimeout(() => goto('/login'), 1000);
+				return;
+			}
 			const message = (err as Error).message || '';
 			if (message.includes('403')) {
 				showOwnerError = true;
@@ -167,6 +189,12 @@
 			showToast(!file.read_only ? 'Read-only enabled' : 'Read-only disabled');
 		} catch (err) {
 			console.error(err);
+			if (err instanceof UnauthorizedError) {
+				statusMessage.set('Session expired. Redirecting to login...');
+				clearToken();
+				setTimeout(() => goto('/login'), 1000);
+				return;
+			}
 			const message = (err as Error).message || '';
 			if (message.includes('403')) {
 				showOwnerError = true;
