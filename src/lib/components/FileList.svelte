@@ -336,19 +336,18 @@
 								{@const Icon = getIconComponent(file.filename.split('.').pop() || '')}
 								<Icon class="h-12 w-12 rounded border bg-gray-700 p-2 text-white" />
 							{/if}
-							<span
-								class="flex max-w-xs items-center gap-1 truncate font-semibold hover:underline"
-								title={file.filename}
-							>
-								{file.filename}
+							<span class="flex max-w-xs items-center gap-1 font-semibold hover:underline">
+								<span class="truncate" title={file.filename}>
+									{file.filename}
+								</span>
 								{#if file.is_private}
-									<Lock class="h-4 w-4 text-gray-400" />
+									<Lock class="h-4 w-4 flex-shrink-0 text-gray-400" />
 								{/if}
 								{#if file.delete_protected}
-									<Shield class="h-4 w-4 text-gray-400" />
+									<Shield class="h-4 w-4 flex-shrink-0 text-gray-400" />
 								{/if}
 								{#if file.read_only}
-									<PencilOff class="h-4 w-4 text-gray-400" />
+									<PencilOff class="h-4 w-4 flex-shrink-0 text-gray-400" />
 								{/if}
 							</span>
 						</div>
