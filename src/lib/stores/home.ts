@@ -51,15 +51,34 @@ export async function loadFiles(page: number = get(currentPage), fetchThumbs = t
 		const { files: newFiles, has_next } = await fetchFiles(get(token), page);
 		currentPage.set(page);
 		hasNextPage.set(has_next);
-		for (const url of Object.values(get(thumbnails))) {
-			URL.revokeObjectURL(url);
-		}
-		thumbnails.set({});
-		files.set(Array.isArray(newFiles) ? newFiles : []);
-		// fetch thumbnails that already exist; new ones will arrive via websocket events
+
+		const nextFiles = Array.isArray(newFiles) ? newFiles : [];
+
 		if (fetchThumbs) {
-			thumbnails.set(await buildThumbnails(get(files), 0));
+			// clear all thumbnails when refetching them
+			for (const url of Object.values(get(thumbnails))) {
+				URL.revokeObjectURL(url);
+			}
+			thumbnails.set(await buildThumbnails(nextFiles, 0));
+		} else {
+			// keep existing thumbnails for files that remain in the list
+			const currentThumbs = get(thumbnails);
+			const validIds = new Set(nextFiles.map((f) => f.id));
+			let changed = false;
+			for (const id of Object.keys(currentThumbs)) {
+				if (!validIds.has(id)) {
+					URL.revokeObjectURL(currentThumbs[id]);
+					delete currentThumbs[id];
+					changed = true;
+				}
+			}
+			if (changed) {
+				thumbnails.set({ ...currentThumbs });
+			}
 		}
+
+		files.set(nextFiles);
+		// thumbnails for new files will arrive via websocket events
 	} catch (err: unknown) {
 		if (err instanceof UnauthorizedError) {
 			statusMessage.set('Session expired. Redirecting to login...');
