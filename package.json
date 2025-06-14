@@ -37,6 +37,7 @@
 		"vite-plugin-devtools-json": "^0.2.0"
 	},
 	"dependencies": {
+		"@sveltejs/adapter-node": "^5.2.12",
 		"lucide-svelte": "^0.515.0"
 	}
 }

@@ -22,6 +22,18 @@ npm install
 npm run dev
 ```
 
+4. Build the project for production:
+
+```bash
+npm run build
+```
+
+5. Start the production server:
+
+```bash
+node build
+```
+
 See [docs/setup.md](docs/setup.md) for details on configuring the environment and [docs/development.md](docs/development.md) for additional commands.
 
 ## Documentation
