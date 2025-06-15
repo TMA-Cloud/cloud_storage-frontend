@@ -1,12 +1,11 @@
 # Features
 
-The application provides a web interface for a cloud storage service. Major features include:
+TMA Cloud Frontend delivers a seamless and intuitive experience for interacting with your cloud storage. Key features include:
 
-- **Authentication** – users sign in to obtain an access token stored in a cookie.
-- **File management** – upload files (public or private), download, delete, and update privacy, protection and read‑only flags.
-- **Search and pagination** – browse files page by page and search by name.
-- **Image previews** – thumbnails are fetched from the backend and updated when `thumbnail_ready` events arrive. Clicking an image opens a larger preview.
-- **Document editing** – files can be opened in OnlyOffice using the `/file/[id]` route when the Document Server URL is configured.
-- **Real‑time updates** – a WebSocket connection listens for events about file changes so the list stays in sync without refreshing.
-
-The UI is built with Tailwind CSS and Lucide icons.
+- **Authentication** – effortless sign-in with cookie-based access tokens to ensure secure and persistent sessions.
+- **File management** – easily upload, download, delete, and organize files. Manage privacy settings, read-only permissions, and file protection with just a few clicks
+- **Search and pagination** – quickly locate files by name and navigate large collections effortlessly with paginated browsing.
+- **Image previews** – automatically generated thumbnails update in real time. Click any image for a full-size preview experience.
+- **Document editing** – edit files directly in OnlyOffice via deep integration, providing a smooth document editing workflow.
+- **Real-time updates** – stay up to date with instant file list updates through a live WebSocket connection—no manual refreshes needed.
+- **Modern UI Design** - Built with Tailwind CSS and Lucide icons, delivering a clean, responsive, and visually appealing interface.

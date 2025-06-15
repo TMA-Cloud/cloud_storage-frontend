@@ -1,17 +1,17 @@
 # Setup
 
-This project relies on environment variables for connecting to the backend API and to the ONLYOFFICE Document Server. Create a `.env` file at the project root based on `.env.example` and provide values for the following variables:
+TMA Cloud frontend uses environment variables to connect to the backend API and the ONLYOFFICE Document Server. Copy `.env.example` to `.env` and fill in the following keys:
 
-| Variable                       | Description                                                                        |
-| ------------------------------ | ---------------------------------------------------------------------------------- |
-| `VITE_API_BASE_URL`            | Base URL of the backend API (e.g. `http://localhost:3000`).                        |
-| `VITE_ONLYOFFICE_JS_URL`       | URL to the ONLYOFFICE Document Server API script.                                  |
-| `VITE_SUPPORTED_TYPES_VERSION` | Optional version string used for cache busting when fetching supported MIME types. |
+| Variable                       | Description                                                                       |
+| ------------------------------ | --------------------------------------------------------------------------------- |
+| `VITE_API_BASE_URL`            | URL of the backend API, for example `http://localhost:3000`.                      |
+| `VITE_ONLYOFFICE_JS_URL`       | Location of the ONLYOFFICE Document Server script.                                |
+| `VITE_SUPPORTED_TYPES_VERSION` | Optional version string used to bust caches when retrieving supported MIME types. |
 
-Install dependencies using npm:
+Install the dependencies:
 
 ```bash
 npm install
 ```
 
-After that you can run the development server or build the project. See [development instructions](development.md) for the available commands.
+After installation you can start the development server or create a production build. See [development.md](development.md) for available commands.

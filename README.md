@@ -1,40 +1,30 @@
-# Cloud Storage Frontend
+# TMA Cloud Frontend
 
-A SvelteKit application that provides a web interface for managing files in a cloud storage backend.
+A modern SvelteKit web application that simplifies cloud-based file storage and management.
+
+## Key Features
 
 - Upload and download files
-- Preview images and edit documents via OnlyOffice
+- Preview images and edit documents through OnlyOffice
 - Manage privacy, protection and read‑only settings
-- Real‑time updates through WebSocket events
+- Receive real‑time updates via WebSocket events
 
 ## Quick Start
 
-1. Copy `.env.example` to `.env` and fill in the required values.
-2. Install dependencies:
+1. Copy `.env.example` to `.env` and configure the required environment variables.
+2. Install the dependencies:
 
-```bash
-npm install
-```
+   ```bash
+   npm install
+   ```
 
-3. Start the development server:
+3. Start a development server:
 
-```bash
-npm run dev
-```
+   ```bash
+   npm run dev
+   ```
 
-4. Build the project for production:
-
-```bash
-npm run build
-```
-
-5. Start the production server:
-
-```bash
-node build
-```
-
-See [docs/setup.md](docs/setup.md) for details on configuring the environment and [docs/development.md](docs/development.md) for additional commands.
+Refer to [docs/setup.md](docs/setup.md) for environment setup and [docs/development.md](docs/development.md) for additional commands.
 
 ## Documentation
 
