@@ -3,9 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount, tick } from 'svelte';
 	import { getToken, clearToken } from '$lib/api/auth';
-
-	const API_BASE = import.meta.env.VITE_API_BASE_URL;
-	const ONLYOFFICE_JS_URL = import.meta.env.VITE_ONLYOFFICE_JS_URL;
+	import { API_BASE, ONLYOFFICE_JS_URL } from '$lib/api/config';
 
 	onMount(async () => {
 		if (!ONLYOFFICE_JS_URL) {

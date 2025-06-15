@@ -11,6 +11,7 @@ declare global {
 
 	interface Window {
 		DocsAPI: unknown;
+		__env?: import('$lib/api/config').RuntimeEnv;
 	}
 
 	const __APP_VERSION__: string;

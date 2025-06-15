@@ -1,0 +1,30 @@
+# VCS data
+.git
+.gitignore
+
+# Documentation
+docs/
+**/*.md
+
+# Build modules
+node_modules/
+.svelte-kit
+build
+
+# Test & Logs
+test/
+*.log
+
+# Local environment
+*.env
+*.env.*
+
+# Docker-related configs that aren't needed in build context
+.dockerignore
+
+# Editor and OS-specific
+*.swp
+*.swo
+*.DS_Store
+*.idea
+.vscode
