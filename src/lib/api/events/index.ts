@@ -4,7 +4,7 @@ export interface BackendEvent {
 	data?: unknown;
 }
 
-import { API_BASE } from './config';
+import { API_BASE } from '../config';
 
 function buildWsUrl(): string {
 	const url = API_BASE.replace(/^http/, 'ws');

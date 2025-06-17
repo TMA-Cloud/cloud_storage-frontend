@@ -1,5 +1,5 @@
-import { API_BASE } from './config';
-import { apiFetch } from './http';
+import { API_BASE } from '../config';
+import { apiFetch } from '../http';
 import { APP_VERSION } from '$lib/version';
 import { compareVersions } from '$lib/utils/version';
 
