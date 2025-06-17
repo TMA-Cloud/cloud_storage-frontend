@@ -10,7 +10,7 @@
 	} from '$lib/api/files';
 	import { formatFileSize } from '$lib/utils/format';
 	import { getIconComponent } from '$lib/utils/fileIcons';
-	import ThumbnailPlaceholder from './ThumbnailPlaceholder.svelte';
+	import ThumbnailPlaceholder from '$lib/components/ui/ThumbnailPlaceholder.svelte';
 	import {
 		Download,
 		Trash2,
@@ -22,8 +22,8 @@
 		PencilOff,
 		PencilLine
 	} from 'lucide-svelte';
-	import AlertModal from './AlertModal.svelte';
-	import Toast from './Toast.svelte';
+	import AlertModal from '$lib/components/modals/AlertModal.svelte';
+	import Toast from '$lib/components/ui/Toast.svelte';
 	import { goto } from '$app/navigation';
 	import { clearToken } from '$lib/api/auth';
 	import { UnauthorizedError } from '$lib/api/http';

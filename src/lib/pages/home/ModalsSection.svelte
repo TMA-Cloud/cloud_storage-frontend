@@ -1,9 +1,9 @@
 <script lang="ts">
-	import UploadModal from '$lib/components/UploadModal.svelte';
-	import UserProfileModal from '$lib/components/UserProfileModal.svelte';
-	import ImagePreviewer from '$lib/components/ImagePreviewer.svelte';
-	import ConfirmModal from '$lib/components/ConfirmModal.svelte';
-	import AlertModal from '$lib/components/AlertModal.svelte';
+	import UploadModal from '$lib/components/modals/UploadModal.svelte';
+	import UserProfileModal from '$lib/components/modals/UserProfileModal.svelte';
+	import ImagePreviewer from '$lib/components/modals/ImagePreviewer.svelte';
+	import ConfirmModal from '$lib/components/modals/ConfirmModal.svelte';
+	import AlertModal from '$lib/components/modals/AlertModal.svelte';
 	import {
 		token,
 		files,

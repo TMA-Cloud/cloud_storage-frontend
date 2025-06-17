@@ -1,5 +1,5 @@
 <script lang="ts">
-	import FileList from '$lib/components/FileList.svelte';
+	import FileList from '$lib/components/file/FileList.svelte';
 	import {
 		files,
 		thumbnails,
