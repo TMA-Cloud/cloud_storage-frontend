@@ -6,4 +6,4 @@ export * from './upload';
 export * from './delete';
 export * from './update';
 export * from './search';
-export * from './supported';
+export * from './supported_types';
