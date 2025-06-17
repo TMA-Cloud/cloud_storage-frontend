@@ -140,6 +140,8 @@ export function destroyHome() {
 		socket.close();
 		socket = null;
 	}
+	// ensure any open profile modal is closed when leaving the page
+	showProfileModal.set(false);
 }
 
 export function handleEvent(evt: BackendEvent) {
