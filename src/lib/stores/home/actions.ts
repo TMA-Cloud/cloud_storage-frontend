@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 import { goto } from '$app/navigation';
 import { fetchFiles, searchFiles, type FileMeta, openFile, closePreview } from '$lib/api/files';
 import { UnauthorizedError } from '$lib/api/http';
-import { buildThumbnails } from '$lib/utils/thumbnails';
+import { buildThumbnails } from '$lib/utils/file';
 import {
 	token,
 	files,

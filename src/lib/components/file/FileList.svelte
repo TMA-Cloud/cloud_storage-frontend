@@ -9,7 +9,7 @@
 		updateFileReadOnly
 	} from '$lib/api/files';
 	import { formatFileSize } from '$lib/utils/format';
-	import { getIconComponent } from '$lib/utils/fileIcons';
+	import { getIconComponent } from '$lib/utils/file';
 	import ThumbnailPlaceholder from '$lib/components/ui/ThumbnailPlaceholder.svelte';
 	import {
 		Download,
