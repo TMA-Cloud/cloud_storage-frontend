@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import { login } from '$lib/api/auth';
+	import { UnauthorizedError } from '$lib/api/http';
 	import { clearStatusMessage } from '$lib/stores/home';
 
 	let username = '';
@@ -17,8 +18,12 @@
 			clearStatusMessage();
 			goto('/');
 		} catch (err: unknown) {
-			const message = (err as Error).message || '';
-			error = message || 'Login failed';
+			if (err instanceof UnauthorizedError) {
+				error = 'Invalid Username/Password';
+			} else {
+				const message = (err as Error).message || '';
+				error = message || 'Login failed';
+			}
 		}
 	}
 </script>
