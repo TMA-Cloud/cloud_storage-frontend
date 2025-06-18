@@ -13,6 +13,7 @@
 		loadFiles,
 		handleOpen,
 		fileToDelete,
+		fileToRename,
 		selectedIds
 	} from '$lib/stores/home';
 </script>
@@ -44,6 +45,7 @@
 		headerOffset={$headerHeight}
 		on:open={(e) => handleOpen(e.detail)}
 		on:delete={(e) => ($fileToDelete = e.detail)}
+		on:rename={(e) => ($fileToRename = e.detail)}
 		on:selection={(e) => ($selectedIds = e.detail)}
 	/>
 	{#if !$searchActive}

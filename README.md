@@ -5,6 +5,7 @@ A modern SvelteKit web application that simplifies cloud-based file storage and 
 ## Key Features
 
 - Upload and download files
+- Rename files effortlessly
 - Preview images and edit documents through OnlyOffice
 - Manage privacy, protection and read‑only settings
 - Receive real‑time updates via WebSocket events

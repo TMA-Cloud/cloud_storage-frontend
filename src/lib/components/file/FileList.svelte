@@ -20,7 +20,8 @@
 		Shield,
 		ShieldOff,
 		PencilOff,
-		PencilLine
+		PencilLine,
+		FileEdit
 	} from 'lucide-svelte';
 	import AlertModal from '$lib/components/modals/AlertModal.svelte';
 	import Toast from '$lib/components/ui/Toast.svelte';
@@ -37,6 +38,7 @@
 	const dispatch = createEventDispatcher<{
 		open: FileMeta;
 		delete: FileMeta;
+		rename: FileMeta;
 		selection: string[];
 	}>();
 
@@ -85,6 +87,10 @@
 
 	function requestDelete(file: FileMeta) {
 		dispatch('delete', file);
+	}
+
+	function requestRename(file: FileMeta) {
+		dispatch('rename', file);
 	}
 
 	let showOwnerError = false;
@@ -467,6 +473,18 @@
 										<PencilOff class="h-4 w-4" />
 										<span>Read Only</span>
 									{/if}
+								</button>
+								<button
+									type="button"
+									on:click|stopPropagation={() => {
+										requestRename(file);
+										openMenu = null;
+									}}
+									class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-200 hover:bg-gray-600"
+									aria-label={`Rename ${file.filename}`}
+								>
+									<FileEdit class="h-4 w-4" />
+									<span>Rename</span>
 								</button>
 								<button
 									type="button"

@@ -68,6 +68,12 @@ export function handleEvent(evt: BackendEvent) {
 			files.update((fs) => fs.map((f) => (f.id === evt.file_id ? { ...f, read_only: val } : f)));
 		}
 	}
+	if (evt.type === 'rename') {
+		const name = (evt.data as Record<string, unknown>)?.filename as string | undefined;
+		if (typeof name === 'string') {
+			files.update((fs) => fs.map((f) => (f.id === evt.file_id ? { ...f, filename: name } : f)));
+		}
+	}
 }
 
 export async function checkVersions() {

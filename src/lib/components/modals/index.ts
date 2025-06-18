@@ -4,3 +4,4 @@ export { default as ConfirmModal } from './ConfirmModal.svelte';
 export { default as ImagePreviewer } from './ImagePreviewer.svelte';
 export { default as UploadModal } from './UploadModal.svelte';
 export { default as UserProfileModal } from './UserProfileModal.svelte';
+export { default as RenameModal } from './RenameModal.svelte';

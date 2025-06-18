@@ -4,6 +4,7 @@
 	import ImagePreviewer from '$lib/components/modals/ImagePreviewer.svelte';
 	import ConfirmModal from '$lib/components/modals/ConfirmModal.svelte';
 	import AlertModal from '$lib/components/modals/AlertModal.svelte';
+	import RenameModal from '$lib/components/modals/RenameModal.svelte';
 	import {
 		token,
 		files,
@@ -11,6 +12,7 @@
 		showUploadModal,
 		showProfileModal,
 		fileToDelete,
+		fileToRename,
 		selectedIds,
 		bulkDeleteIds,
 		confirmBulk,
@@ -23,7 +25,7 @@
 		loadFiles,
 		handleClosePreview
 	} from '$lib/stores/home';
-	import { deleteFile } from '$lib/api/files';
+	import { deleteFile, renameFile } from '$lib/api/files';
 	import { UnauthorizedError, HttpError } from '$lib/api/http';
 	import { clearToken } from '$lib/api/auth';
 	import { goto } from '$app/navigation';
@@ -33,6 +35,37 @@
 	<UploadModal
 		onClose={() => ($showUploadModal = false)}
 		onUploaded={() => loadFiles(undefined, false)}
+	/>
+{/if}
+
+{#if $fileToRename}
+	<RenameModal
+		file={$fileToRename}
+		onClose={() => ($fileToRename = null)}
+		onRename={async (name) => {
+			if (!$fileToRename) return;
+			try {
+				await renameFile($fileToRename.id, name, $token);
+				await loadFiles();
+			} catch (err) {
+				console.error(err);
+				if (err instanceof UnauthorizedError) {
+					$statusMessage = 'Session expired. Redirecting to login...';
+					clearToken();
+					setTimeout(() => goto('/login'), 1000);
+				} else if (err instanceof HttpError) {
+					if (err.status === 403) {
+						$showOwnerError = true;
+					} else if (err.status === 404) {
+						$statusNotFoundError = true;
+					} else {
+						console.error(err);
+					}
+				}
+			} finally {
+				$fileToRename = null;
+			}
+		}}
 	/>
 {/if}
 

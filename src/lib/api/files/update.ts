@@ -45,3 +45,14 @@ export async function updateFileReadOnly(
 		body: JSON.stringify({ readonly: readOnly })
 	});
 }
+
+export async function renameFile(id: string, filename: string, token: string): Promise<void> {
+	await apiFetch(`${API_BASE}/api/files/${id}/rename`, {
+		method: 'POST',
+		headers: {
+			Authorization: `Bearer ${token}`,
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ filename })
+	});
+}
