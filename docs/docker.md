@@ -15,6 +15,18 @@ make docker-build
 This produces an image tagged `tma-cloud-frontend:<version>` where
 `<version>` matches the value in `vite.config.ts`.
 
+## Pre-built images
+
+Images built from the `main` branch are published automatically to
+the GitHub Container Registry (GHCR). You can pull the latest image
+with:
+
+```bash
+docker pull ghcr.io/tma-cloud/tma-cloud-frontend:latest
+```
+
+Replace `latest` with a version tag if you need a specific release.
+
 ## Running the container
 
 The container expects three environment variables which are written to `static/env.js` at startup and
