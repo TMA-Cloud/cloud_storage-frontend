@@ -37,3 +37,11 @@ Refer to [docs/setup.md](docs/setup.md) for environment setup and [docs/developm
 - [Features](docs/features.md)
 - [Project Structure](docs/structure.md)
 - [Docker](docs/docker.md)
+
+## Contributing
+
+Pull requests are welcome! Feel free to open issues for any bugs or feature requests.
+
+## License
+
+This project is released under the [MIT License](LICENSE).

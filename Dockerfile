@@ -49,6 +49,7 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh && chown appuser:appgroup /usr/
 LABEL org.opencontainers.image.title="TMA Cloud Frontend" \
     org.opencontainers.image.description="TMA Cloud Storage" \
     org.opencontainers.image.source="https://github.com/TMA-Cloud/cloud_storage-frontend" \
+    org.opencontainers.image.licenses="MIT" \
     org.opencontainers.image.version=$APP_VERSION \
     org.opencontainers.image.revision=$COMMIT
 
