@@ -2,7 +2,7 @@
 
 ## The repository is organized as follows
 
-```
+```bash
 ├─ src
 │ ├─ lib             # TypeScript helpers and reusable components
 │ │ ├─ api           # Helpers for calling the backend API
