@@ -14,6 +14,7 @@
 		handleOpen,
 		fileToDelete,
 		fileToRename,
+		fileToShare,
 		selectedIds
 	} from '$lib/stores/home';
 </script>
@@ -46,6 +47,7 @@
 		on:open={(e) => handleOpen(e.detail)}
 		on:delete={(e) => ($fileToDelete = e.detail)}
 		on:rename={(e) => ($fileToRename = e.detail)}
+		on:share={(e) => ($fileToShare = e.detail)}
 		on:selection={(e) => ($selectedIds = e.detail)}
 	/>
 	{#if !$searchActive}

@@ -5,6 +5,7 @@
 	import ConfirmModal from '$lib/components/modals/ConfirmModal.svelte';
 	import AlertModal from '$lib/components/modals/AlertModal.svelte';
 	import RenameModal from '$lib/components/modals/RenameModal.svelte';
+	import ShareModal from '$lib/components/modals/ShareModal.svelte';
 	import {
 		token,
 		files,
@@ -13,6 +14,7 @@
 		showProfileModal,
 		fileToDelete,
 		fileToRename,
+		fileToShare,
 		selectedIds,
 		bulkDeleteIds,
 		confirmBulk,
@@ -67,6 +69,10 @@
 			}
 		}}
 	/>
+{/if}
+
+{#if $fileToShare}
+	<ShareModal file={$fileToShare} token={$token} onClose={() => ($fileToShare = null)} />
 {/if}
 
 {#if $previewImage}

@@ -15,6 +15,7 @@ export const showUploadModal = writable(false);
 export const showProfileModal = writable(false);
 export const fileToDelete = writable<FileMeta | null>(null);
 export const fileToRename = writable<FileMeta | null>(null);
+export const fileToShare = writable<FileMeta | null>(null);
 export const selectedIds = writable<string[]>([]);
 export const bulkDeleteIds = writable<string[]>([]);
 export const confirmBulk = writable(false);

@@ -7,3 +7,4 @@ export * from './delete';
 export * from './update';
 export * from './search';
 export * from './supported_types';
+export * from './share';

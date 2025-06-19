@@ -21,7 +21,8 @@
 		ShieldOff,
 		PencilOff,
 		PencilLine,
-		FileEdit
+		FileEdit,
+		Share2
 	} from 'lucide-svelte';
 	import AlertModal from '$lib/components/modals/AlertModal.svelte';
 	import Toast from '$lib/components/ui/Toast.svelte';
@@ -39,6 +40,7 @@
 		open: FileMeta;
 		delete: FileMeta;
 		rename: FileMeta;
+		share: FileMeta;
 		selection: string[];
 	}>();
 
@@ -91,6 +93,10 @@
 
 	function requestRename(file: FileMeta) {
 		dispatch('rename', file);
+	}
+
+	function requestShare(file: FileMeta) {
+		dispatch('share', file);
 	}
 
 	let showOwnerError = false;
@@ -473,6 +479,18 @@
 										<PencilOff class="h-4 w-4" />
 										<span>Read Only</span>
 									{/if}
+								</button>
+								<button
+									type="button"
+									on:click|stopPropagation={() => {
+										requestShare(file);
+										openMenu = null;
+									}}
+									class="flex w-full items-center gap-2 px-4 py-2 text-sm text-gray-200 hover:bg-gray-600"
+									aria-label={`Share ${file.filename}`}
+								>
+									<Share2 class="h-4 w-4" />
+									<span>Share</span>
 								</button>
 								<button
 									type="button"
