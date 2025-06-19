@@ -33,6 +33,7 @@ Refer to [docs/setup.md](docs/setup.md) for environment setup and [docs/developm
 ## Documentation
 
 - [Setup](docs/setup.md)
+- [Quick Start (Script + Docker Compose)](https://github.com/TMA-Cloud/setup) – run the all-in-one script to pull all images and launch the app in Docker containers.
 - [Development](docs/development.md)
 - [Features](docs/features.md)
 - [Project Structure](docs/structure.md)

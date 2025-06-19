@@ -20,3 +20,7 @@ npm install
 
 After installation you can start the development server or create a production build. See [development.md](development.md) for available commands.
 If you prefer running the app in Docker, the image accepts the same environment variables at runtime. See [docker.md](docker.md) for details on building and running the container.
+
+**Note:** A ready-to-use Docker Compose configuration is available in the [TMA-Cloud/setup](https://github.com/TMA-Cloud/setup). Follow
+the instructions in that repository to run a single setup script which pulls the public backend, frontend,Add commentMore actions
+and other images defined in its docker-compose.yml.

@@ -22,7 +22,7 @@ the GitHub Container Registry (GHCR). You can pull the latest image
 with:
 
 ```bash
-docker pull ghcr.io/tma-cloud/tma-cloud-frontend:latest
+docker pull ghcr.io/tma-cloud/cloud_storage-frontend:latest
 ```
 
 Replace `latest` with a version tag if you need a specific release.
@@ -42,7 +42,7 @@ Example run command:
 make docker-run ENV_FILE=.env
 ```
 
-Alternatively you can also run the image manually:
+Alternatively, you can also run the image manually:
 
 ```bash
 docker run --rm -p 3000:3000 --env-file .env tma-cloud-frontend:<version>
@@ -54,3 +54,8 @@ from these variables into `/app/static/env.js` and mirrors that file to
 troubleshooting.
 
 All configuration options are described in [setup.md](setup.md).
+
+## Using Docker Compose
+
+A ready-to-use Docker Compose configuration is available in the [TMA-Cloud/setup](https://github.com/TMA-Cloud/setup) repository.  
+Follow the instructions in that repository to run a single setup script which pulls the public backend, frontend, and other images defined in its `docker-compose.yml`.
